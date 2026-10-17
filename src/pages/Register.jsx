@@ -1,12 +1,21 @@
 import { useState } from 'react'
-import { Link } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { register } from '../features/auth/authSlice.js'
 import './Auth.css'
 
 export default function Register() {
   const [message, setMessage] = useState('')
+  const [isSubmitting, setIsSubmitting] = useState(false)
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const user = useSelector((state) => state.auth.user)
 
-  function handleSubmit(event) {
+  if (user) return <Navigate to="/events" replace />
+
+  async function handleSubmit(event) {
     event.preventDefault()
+    if (isSubmitting) return
     const form = event.currentTarget
     const name = form.elements.namedItem('name')
     const password = form.elements.namedItem('password')
@@ -19,7 +28,19 @@ export default function Register() {
 
     if (!form.reportValidity()) return
 
-    setMessage('Registration is not available yet. No account has been created.')
+    const values = new FormData(form)
+    setMessage('')
+    setIsSubmitting(true)
+    try {
+      await dispatch(register({
+        name: values.get('name'), email: values.get('email'), password: values.get('password'),
+      })).unwrap()
+      navigate('/events', { replace: true })
+    } catch (error) {
+      setMessage(error.message || 'Registration failed. Please try again.')
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   function handleChange(event) {
@@ -31,6 +52,7 @@ export default function Register() {
   return (
     <section className="auth-page" aria-labelledby="register-heading">
       <h1 id="register-heading">Register</h1>
+      <p className="auth-note">This demo saves your account in this browser. Use a password you don't use elsewhere.</p>
       <form className="auth-form" onSubmit={handleSubmit} onChange={handleChange}>
         <div className="auth-field">
           <label htmlFor="register-name">Full name</label>
@@ -49,7 +71,7 @@ export default function Register() {
           <label htmlFor="register-confirm-password">Confirm password</label>
           <input id="register-confirm-password" name="confirmPassword" type="password" autoComplete="new-password" required />
         </div>
-        <button type="submit">Create account</button>
+        <button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Creating account...' : 'Create account'}</button>
         <p className="auth-message" role="status">{message}</p>
       </form>
       <p>Already have an account? <Link to="/login">Login</Link></p>

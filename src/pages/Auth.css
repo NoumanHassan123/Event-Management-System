@@ -52,6 +52,16 @@
   border-color: var(--accent);
 }
 
+.auth-form button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.auth-note {
+  margin-bottom: 24px;
+  font-size: 0.9rem;
+}
+
 .auth-page a {
   color: var(--accent);
 }
