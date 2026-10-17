@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import { login } from '../features/auth/authSlice.js'
 import { getAuthDestination } from '../utils/authDestination.js'
+import PasswordInput from '../components/PasswordInput.jsx'
 import './Auth.css'
 
 export default function Login() {
@@ -49,7 +50,7 @@ export default function Login() {
         </div>
         <div className="auth-field">
           <label htmlFor="login-password">Password</label>
-          <input id="login-password" name="password" type="password" autoComplete="current-password" required />
+          <PasswordInput id="login-password" name="password" autoComplete="current-password" required />
         </div>
         <button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Logging in...' : 'Login'}</button>
         <p className="auth-message" role="status">{message}</p>

@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import { register } from '../features/auth/authSlice.js'
 import { getAuthDestination } from '../utils/authDestination.js'
+import PasswordInput from '../components/PasswordInput.jsx'
 import './Auth.css'
 
 export default function Register() {
@@ -65,12 +66,12 @@ export default function Register() {
         </div>
         <div className="auth-field">
           <label htmlFor="register-password">Password</label>
-          <input id="register-password" name="password" type="password" autoComplete="new-password" minLength={8} aria-describedby="password-hint" required />
+          <PasswordInput id="register-password" name="password" autoComplete="new-password" minLength={8} aria-describedby="password-hint" required />
           <small id="password-hint">Use at least 8 characters.</small>
         </div>
         <div className="auth-field">
           <label htmlFor="register-confirm-password">Confirm password</label>
-          <input id="register-confirm-password" name="confirmPassword" type="password" autoComplete="new-password" required />
+          <PasswordInput id="register-confirm-password" name="confirmPassword" label="confirm password" autoComplete="new-password" required />
         </div>
         <button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Creating account...' : 'Create account'}</button>
         <p className="auth-message" role="status">{message}</p>
