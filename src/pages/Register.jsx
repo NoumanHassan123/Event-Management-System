@@ -1,17 +1,19 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { register } from '../features/auth/authSlice.js'
+import { getAuthDestination } from '../utils/authDestination.js'
 import './Auth.css'
 
 export default function Register() {
   const [message, setMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const location = useLocation()
   const user = useSelector((state) => state.auth.user)
+  const destination = getAuthDestination(location.state?.from)
 
-  if (user) return <Navigate to="/events" replace />
+  if (user) return <Navigate to={destination} replace />
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -35,7 +37,6 @@ export default function Register() {
       await dispatch(register({
         name: values.get('name'), email: values.get('email'), password: values.get('password'),
       })).unwrap()
-      navigate('/events', { replace: true })
     } catch (error) {
       setMessage(error.message || 'Registration failed. Please try again.')
     } finally {
@@ -74,7 +75,7 @@ export default function Register() {
         <button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Creating account...' : 'Create account'}</button>
         <p className="auth-message" role="status">{message}</p>
       </form>
-      <p>Already have an account? <Link to="/login">Login</Link></p>
+      <p>Already have an account? <Link to="/login" state={location.state}>Login</Link></p>
     </section>
   )
 }

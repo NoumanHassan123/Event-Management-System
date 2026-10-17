@@ -74,6 +74,8 @@ h2 {
 }
 
 h1 {
+  line-height: 1.15;
+  overflow-wrap: anywhere;
   font-size: 56px;
   letter-spacing: -1.68px;
   margin: 32px 0;

@@ -34,6 +34,8 @@ If PowerShell blocks `npm.ps1`, use `npm.cmd` for these commands.
 
 ## Current behavior
 
+See [QA.md](QA.md) for automated test scope and the pending browser/mobile checklist.
+
 - Registration creates an account in this browser and signs the user in.
 - Authentication state uses Redux, with a session restored from Local Storage on refresh.
 - Passwords use salted PBKDF2 hashes. This remains a frontend simulation, not backend authentication; use demo credentials only.

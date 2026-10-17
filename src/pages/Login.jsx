@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, Navigate, useLocation } from 'react-router-dom'
 import { login } from '../features/auth/authSlice.js'
+import { getAuthDestination } from '../utils/authDestination.js'
 import './Auth.css'
 
 export default function Login() {
@@ -11,10 +12,8 @@ export default function Login() {
   const location = useLocation()
   const user = useSelector((state) => state.auth.user)
   const from = location.state?.from
-  const canReturn = from?.pathname === '/my-events' || /^\/events\/[^/]+$/.test(from?.pathname || '')
-  const destination = canReturn
-    ? { pathname: from.pathname, search: from.search, hash: from.hash }
-    : '/events'
+  const destination = getAuthDestination(from)
+  const canReturn = destination !== '/events'
 
   if (user) return <Navigate to={destination} replace />
 
@@ -55,7 +54,7 @@ export default function Login() {
         <button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Logging in...' : 'Login'}</button>
         <p className="auth-message" role="status">{message}</p>
       </form>
-      <p>Don't have an account? <Link to="/register">Register</Link></p>
+      <p>Don't have an account? <Link to="/register" state={location.state}>Register</Link></p>
     </section>
   )
 }
