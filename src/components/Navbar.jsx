@@ -2,6 +2,7 @@ import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, NavLink, useNavigate } from 'react-router-dom'
 import { logout } from '../features/auth/authSlice.js'
+import Icon from './Icon.jsx'
 import './Navbar.css'
 
 export default function Navbar() {
@@ -27,22 +28,23 @@ export default function Navbar() {
   return (
     <header className="site-header">
       <Link className="site-brand" to="/events">
-        Event Management System
+        <span className="brand-icon"><Icon name="ticket" size={24} /></span>
+        <span>gather<span className="brand-dot">.</span><small>EVENT MANAGEMENT</small></span>
       </Link>
       <nav aria-label="Main navigation" className="site-nav">
-        <NavLink to="/events">Events</NavLink>
-        <NavLink to="/my-events">My Registrations</NavLink>
+        <NavLink to="/events"><Icon name="search" size={17} /> Discover</NavLink>
+        <NavLink to="/my-events"><Icon name="ticket" size={17} /> My Registrations</NavLink>
         {user ? (
           <>
-            <span className="nav-user">Hello, {user.name}</span>
+            <span className="nav-user"><span className="user-avatar" aria-hidden="true">{user.name.slice(0, 1).toUpperCase()}</span><span>{user.name}</span></span>
             <button type="button" onClick={handleLogout} disabled={isLoggingOut}>
               {isLoggingOut ? 'Logging out...' : 'Logout'}
             </button>
           </>
         ) : (
           <>
-            <NavLink to="/login">Login</NavLink>
-            <NavLink to="/register">Register</NavLink>
+            <NavLink className={({ isActive }) => `nav-login${isActive ? ' active' : ''}`} to="/login">Log in</NavLink>
+            <NavLink className="nav-signup" to="/register">Get started <Icon name="arrow" size={16} /></NavLink>
           </>
         )}
       </nav>

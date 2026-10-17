@@ -4,6 +4,7 @@ import { Link, useParams } from 'react-router-dom'
 import { fetchEventDetails } from '../features/events/eventsSlice.js'
 import EventRegistration from '../components/EventRegistration.jsx'
 import { getEventScheduleLabels } from '../utils/eventDisplay.js'
+import Icon from '../components/Icon.jsx'
 import './EventDetails.css'
 
 export default function EventDetails() {
@@ -28,7 +29,8 @@ export default function EventDetails() {
 
   return (
     <section className="event-details" aria-labelledby="event-heading">
-      <Link to="/events">Back to events</Link>
+      <Link className="back-link" to="/events"><span aria-hidden="true">&larr;</span> Back to discover</Link>
+      <p className="eyebrow details-eyebrow">{category || 'THE EXPERIENCE'}</p>
       <h1 id="event-heading">{event?.name || 'Event Details'}</h1>
       {(!details || details.status === 'loading') && <p role="status">Loading event details...</p>}
       {details?.status === 'failed' && (
@@ -49,6 +51,7 @@ export default function EventDetails() {
             {event.dates?.status?.code && <div><dt>Status</dt><dd>{event.dates.status.code}</dd></div>}
           </dl>
           <section className="event-registration" aria-label="Event registration">
+            <h2><Icon name="ticket" size={23} /> Make it a plan.</h2>
             <EventRegistration key={`${id}`} event={event} />
           </section>
           <section className="event-description" aria-labelledby="about-event-heading">

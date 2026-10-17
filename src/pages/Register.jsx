@@ -4,6 +4,8 @@ import { Link, Navigate, useLocation } from 'react-router-dom'
 import { register } from '../features/auth/authSlice.js'
 import { getAuthDestination } from '../utils/authDestination.js'
 import PasswordInput from '../components/PasswordInput.jsx'
+import AuthLayout from '../components/AuthLayout.jsx'
+import Icon from '../components/Icon.jsx'
 import './Auth.css'
 
 export default function Register() {
@@ -52,9 +54,7 @@ export default function Register() {
   }
 
   return (
-    <section className="auth-page" aria-labelledby="register-heading">
-      <h1 id="register-heading">Register</h1>
-      <p className="auth-note">This demo saves your account in this browser. Use a password you don't use elsewhere.</p>
+    <AuthLayout headingId="register-heading" title="Make yourself at home." subtitle="Create your account. Start collecting experiences.">
       <form className="auth-form" onSubmit={handleSubmit} onChange={handleChange}>
         <div className="auth-field">
           <label htmlFor="register-name">Full name</label>
@@ -73,10 +73,11 @@ export default function Register() {
           <label htmlFor="register-confirm-password">Confirm password</label>
           <PasswordInput id="register-confirm-password" name="confirmPassword" label="confirm password" autoComplete="new-password" required />
         </div>
-        <button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Creating account...' : 'Create account'}</button>
+        <button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Creating account...' : 'Create account'}<Icon name="arrow" size={18} /></button>
         <p className="auth-message" role="status">{message}</p>
       </form>
-      <p>Already have an account? <Link to="/login" state={location.state}>Login</Link></p>
-    </section>
+      <p className="auth-switch">Already part of the crowd? <Link to="/login" state={location.state}>Log in</Link></p>
+      <p className="auth-demo-note">This demo saves your account in this browser. Use a password you don't use elsewhere.</p>
+    </AuthLayout>
   )
 }

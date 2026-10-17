@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link } from 'react-router-dom'
 import EventCard from '../components/EventCard.jsx'
 import CancelRegistration from '../components/CancelRegistration.jsx'
+import Icon from '../components/Icon.jsx'
 import { getEventGroup } from '../utils/eventSchedule.js'
 import { loadRegistrations } from '../features/registrations/registrationsSlice.js'
 import './Events.css'
@@ -28,8 +29,15 @@ export default function MyEvents() {
   const titles = { upcoming: 'Upcoming Events', completed: 'Completed Events', undated: 'Date To Be Announced' }
 
   return (
-    <section className="events-page" aria-labelledby="my-events-heading">
-      <h1 id="my-events-heading">My Registrations</h1>
+    <section className="events-page my-events-page" aria-labelledby="my-events-heading">
+      <header className="page-intro"><span className="eyebrow">YOUR PERSONAL LINEUP</span><h1 id="my-events-heading">Plans worth keeping<span className="accent-text">.</span></h1><p>All your registrations, in one happy place.</p></header>
+      {registrations?.status === 'succeeded' && (
+        <div className="registration-overview">
+          <div><Icon name="ticket" size={24} /><span><strong>{registrations.items.length}</strong> Total registrations</span></div>
+          <div><Icon name="calendar" size={24} /><span><strong>{groups.upcoming.length}</strong> Coming up</span></div>
+          <div><Icon name="check" size={24} /><span><strong>{groups.completed.length}</strong> Memories made</span></div>
+        </div>
+      )}
       <p role="status">{notice?.userId === user?.id ? notice?.message : ''}</p>
       {(!registrations || registrations.status === 'loading') && <p role="status">Loading your registrations...</p>}
       {registrations?.status === 'failed' && (
@@ -58,7 +66,7 @@ export default function MyEvents() {
             ) : <p>No events in this group.</p>}
           </section>
         ))
-      ) : <p>You have no registrations yet. <Link to="/events">Explore events</Link></p>)}
+      ) : <div className="empty-state"><Icon name="ticket" size={38} /><h2>Your next chapter is unwritten.</h2><p>Find an experience you love and register. We will keep your plans right here.</p><Link className="button-primary" to="/events">Explore events <Icon name="arrow" size={18} /></Link></div>)}
     </section>
   )
 }

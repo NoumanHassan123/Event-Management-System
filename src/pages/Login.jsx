@@ -4,6 +4,8 @@ import { Link, Navigate, useLocation } from 'react-router-dom'
 import { login } from '../features/auth/authSlice.js'
 import { getAuthDestination } from '../utils/authDestination.js'
 import PasswordInput from '../components/PasswordInput.jsx'
+import AuthLayout from '../components/AuthLayout.jsx'
+import Icon from '../components/Icon.jsx'
 import './Auth.css'
 
 export default function Login() {
@@ -34,15 +36,13 @@ export default function Login() {
   }
 
   return (
-    <section className="auth-page" aria-labelledby="login-heading">
-      <h1 id="login-heading">Login</h1>
+    <AuthLayout headingId="login-heading" title="Welcome back." subtitle="Your next great experience is waiting.">
       {from?.pathname === '/my-events' && (
         <p className="auth-note">Please log in to view your registrations.</p>
       )}
       {canReturn && from.pathname !== '/my-events' && (
         <p className="auth-note">Please log in to register for this event.</p>
       )}
-      <p className="auth-note">Use the account you created in this browser.</p>
       <form className="auth-form" onSubmit={handleSubmit} onChange={() => setMessage('')}>
         <div className="auth-field">
           <label htmlFor="login-email">Email</label>
@@ -52,10 +52,11 @@ export default function Login() {
           <label htmlFor="login-password">Password</label>
           <PasswordInput id="login-password" name="password" autoComplete="current-password" required />
         </div>
-        <button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Logging in...' : 'Login'}</button>
+        <button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Logging in...' : 'Log in'}<Icon name="arrow" size={18} /></button>
         <p className="auth-message" role="status">{message}</p>
       </form>
-      <p>Don't have an account? <Link to="/register" state={location.state}>Register</Link></p>
-    </section>
+      <p className="auth-switch">New around here? <Link to="/register" state={location.state}>Create an account</Link></p>
+      <p className="auth-demo-note">Demo accounts are saved in this browser.</p>
+    </AuthLayout>
   )
 }

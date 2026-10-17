@@ -2,6 +2,8 @@
 
 A React and Redux Toolkit assignment project with browser-based account registration, login, logout, persistent sessions, protected registrations, and upcoming events from Ticketmaster.
 
+The interface uses the Gather identity: warm ivory backgrounds, navy surfaces, coral accents, ticket-inspired artwork, responsive event cards, category chips, split authentication pages, and a personal registration overview. All artwork and icons are local SVG/CSS; no additional UI package or external font is required.
+
 ## Setup
 
 1. Install Node.js compatible with Vite 8 (Node 22.12+ recommended).

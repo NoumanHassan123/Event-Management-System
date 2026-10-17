@@ -18,6 +18,8 @@ Actual browser and mobile visual checks are pending: no connected browser was av
 - Use Next and Previous, visit details and return, and confirm filters and page remain selected.
 - Check an unknown event URL and retry feedback. Test Offline mode in browser developer tools, then reconnect and retry.
 - At widths 320, 375, 768, and 1280 pixels, check navigation wrapping, headings, forms, cards, details and pagination. Confirm no horizontal page scrolling.
-- Tab through links and form controls; check visible focus indicators and readable light/dark layouts.
+- Tab through links and form controls; check visible focus indicators, the skip-to-content link, password visibility controls, and readable colors in the Gather theme.
+
+The redesigned Events, Login, Register, Event Details, My Registrations, and Not Found pages passed server-render checks with fixture data. This verifies component rendering, page headings, and password controls; it does not verify browser interactions or pixel layout.
 
 Only use demo passwords; authentication is simulated in Local Storage.
