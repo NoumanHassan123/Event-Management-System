@@ -1,57 +1,196 @@
-# Event Management System
+﻿<p align="center">
+  <img src="public/favicon.svg" width="64" height="64" alt="Gather ticket logo" />
+</p>
 
-A React and Redux Toolkit assignment project with browser-based account registration, login, logout, persistent sessions, protected registrations, and upcoming events from Ticketmaster.
+<h1 align="center">Gather</h1>
 
-The interface uses the Gather identity: warm ivory backgrounds, navy surfaces, coral accents, ticket-inspired artwork, responsive event cards, category chips, split authentication pages, and a personal registration overview. All artwork and icons are local SVG/CSS; no additional UI package or external font is required.
+<p align="center"><strong>Discover experiences. Make plans. Collect memories.</strong></p>
 
-## Setup
+<p align="center">
+  <a href="#features">Features</a> &nbsp; / &nbsp;
+  <a href="#quick-start">Quick start</a> &nbsp; / &nbsp;
+  <a href="#architecture">Architecture</a> &nbsp; / &nbsp;
+  <a href="#testing">Testing</a>
+</p>
 
-1. Install Node.js compatible with Vite 8 (Node 22.12+ recommended).
-2. Run `npm install`.
-3. Copy `.env.example` to `.env` in the project root:
+Gather is an event discovery and registration application built with React and Redux Toolkit. Explore live Ticketmaster listings, filter experiences by your interests and location, and keep your personal event lineup in one place.
 
-   ```powershell
-   Copy-Item .env.example .env
-   ```
+The interface pairs warm ivory backgrounds with navy and coral accents, ticket-inspired artwork, responsive cards, and subtle motion. Icons and illustrations are built with local SVG and CSS; no external fonts or animation libraries are needed.
 
-4. Get a Ticketmaster Consumer Key (API key) from https://developer.ticketmaster.com/ and enter it locally:
+## Features
 
-   ```dotenv
-   VITE_TICKETMASTER_API_KEY=your_consumer_key_here
-   ```
+| Area | What you can do |
+| --- | --- |
+| **Discover** | Browse upcoming events with images, dates, categories, venues, and locations. |
+| **Search and filter** | Combine keywords, category, city, and two-letter country codes. Clear filters to start over. |
+| **Explore details** | Open a dedicated event page with its schedule, venue, category, status, description, and provider notes when available. |
+| **Browse more** | Move through 20 results per page with Previous/Next controls while keeping your filters. |
+| **Manage accounts** | Create an account, log in, log out, and restore your session after refreshing. |
+| **Build your lineup** | Register for events, prevent duplicate registrations, and cancel eligible registrations. |
+| **Stay organized** | View your own upcoming, completed, and date-to-be-announced events in My Registrations. |
+| **Enjoy the details** | Reveal/hide passwords, use keyboard navigation, and pause decorative hero animations. Reduced-motion preferences are respected. |
 
-5. Run `npm run dev` and open the URL printed in the terminal. Restart the dev server after changing `.env`.
+Gather includes loading, empty, retry, missing-event, and validation states. New search results take precedence over older responses, and retries retain the selected filters and page.
 
-Never commit `.env` or a real API key. `.env.example` contains only an empty placeholder. Vite exposes `VITE_` variables to the browser; this frontend integration does not keep the key secret from visitors. A deployed application requiring a private key needs a server proxy.
+## Tech stack
+
+| Layer | Technology |
+| --- | --- |
+| Interface | React 19, JavaScript, CSS, inline SVG |
+| Shared state | Redux Toolkit 2, React Redux 9 |
+| Navigation | React Router 7 |
+| Event data | Ticketmaster Discovery API v2 |
+| Local persistence | Browser Local Storage |
+| Password hashing | Web Crypto: salted PBKDF2 with SHA-256 |
+| Development and build | Vite 8 |
+| Code checks | Oxlint |
+| Automated tests | Node.js built-in test runner |
+
+## Quick start
+
+### Prerequisites
+
+- Node.js **22.12+ or 24+** and npm.
+- A Ticketmaster developer account and Consumer Key (API key).
+- A modern browser with Local Storage and Web Crypto enabled.
+
+### 1. Get the project
+
+```sh
+git clone https://github.com/NoumanHassan123/Event-Management-System.git
+cd Event-Management-System
+npm ci
+```
+
+### 2. Configure event data
+
+Copy the environment template into a local `.env` file:
+
+```powershell
+# Windows PowerShell
+Copy-Item .env.example .env
+```
+
+```sh
+# macOS / Linux
+cp .env.example .env
+```
+
+Get your Consumer Key from the [Ticketmaster Developer Portal](https://developer.ticketmaster.com/) and set it in `.env`:
+
+```dotenv
+VITE_TICKETMASTER_API_KEY=your_ticketmaster_consumer_key
+```
+
+`.env` is excluded from Git. Keep real credentials out of commits and screenshots.
+
+### 3. Start the application
+
+```sh
+npm run dev
+```
+
+Open the local URL printed in your terminal. Restart the development server whenever you change `.env`.
+
+**PowerShell tip:** if script execution blocks `npm.ps1`, use `npm.cmd` in place of `npm`, for example `npm.cmd run dev`.
+
+### 4. Try the flow
+
+1. Search for an event. For example, select **Music**, enter **London**, and use **GB** as the country code.
+2. Open an event and choose to register.
+3. Create a browser-local account using a valid Gmail address, or log in. You will return to the event you opened.
+4. Register, visit **My Registrations**, and refresh to check persistence.
+5. Cancel an upcoming registration or explore another event.
 
 ## Commands
 
-- `npm run dev`: start development server.
-- `npm run build`: build into `dist`.
-- `npm run preview`: preview the build locally.
-- `npm run lint`: run Oxlint.
-- `npm test`: run authentication, registration, and Ticketmaster service tests with Node's built-in test runner.
+| Command | Purpose |
+| --- | --- |
+| `npm ci` | Install the dependency versions recorded in the lockfile. |
+| `npm run dev` | Start the development server. |
+| `npm run build` | Generate a production build in `dist/`. |
+| `npm run preview` | Preview the production build locally. |
+| `npm run lint` | Run Oxlint. |
+| `npm test` | Run the automated test suite. |
 
-If PowerShell blocks `npm.ps1`, use `npm.cmd` for these commands.
+## Architecture
 
-## Current behavior
+```text
+src/
+  components/                Reusable navigation, cards, forms, and controls
+  features/
+    auth/                    Account and session state
+    events/                  Listings, filters, pagination, and event details
+    registrations/           Per-user registrations and cancellation
+  pages/                     Route-level views and their styles
+  services/                  Storage, authentication, Ticketmaster, and tests
+  store/                     Redux store configuration
+  utils/                     Validation, formatting, and schedule helpers
+  App.jsx                    Application routes and shared layout
+  main.jsx                   React, Redux Provider, and BrowserRouter setup
+```
 
-See [QA.md](QA.md) for automated test scope and the pending browser/mobile checklist.
-See [REQUIREMENTS.md](REQUIREMENTS.md) for the assignment implementation map and remaining submission checks.
+Pages dispatch Redux actions; services handle API requests, browser storage, and password hashing. The store separates authentication, event data, and registrations. Shared helpers keep validation and schedule behavior consistent across the interface and service layer.
 
-- Registration creates an account in this browser and signs the user in.
-- New registrations accept valid `@gmail.com` addresses only. Email case/outer spaces are normalized; Gmail dot and `+tag` aliases cannot create duplicate accounts. Existing non-Gmail demo accounts retain login access. This validates address syntax/domain, not mailbox ownership.
-- New passwords require 8–128 characters, a letter or number, and at least one special character. Leading/trailing whitespace, hidden/control characters, and all-symbol passwords are rejected. Existing login passwords are not subjected to new signup strength rules. Names support Unicode letters, normalize extra spaces, and are limited to 80 characters.
-- Authentication state uses Redux, with a session restored from Local Storage on refresh.
-- Passwords use salted PBKDF2 hashes. This remains a frontend simulation, not backend authentication; use demo credentials only.
-- `/my-events` requires login and returns the user there after sign-in.
-- `/events` requests up to 20 upcoming events, ordered by date, and displays images, categories, venue dates, and locations.
-- Loading, missing configuration, connection errors, invalid credentials, rate limits, and empty results have feedback.
-- `/events/:id` loads event details directly from Ticketmaster, including images, venue dates and times, location, category, status, description, and notes when available. Direct links and refresh work without first visiting the list. Missing events and request errors show feedback and a retry button.
-- Signed-in users can register from an event details page. Duplicate registrations are blocked and registrations persist separately for each user in Local Storage. My Registrations displays the signed-in user's saved events. These are app registrations, not Ticketmaster ticket reservations or purchases.
-- My Registrations groups saved events into upcoming, completed, and date-to-be-announced sections. Date-only events stay upcoming through the venue's local day; known end timestamps take precedence over start timestamps. These groups use the saved event schedule, rather than live completion tracking.
-- Upcoming and undated registrations can be cancelled. Cancellation persists, updates Redux, and allows re-registration. Completed registrations remain as history and cannot be cancelled; registration for past events is closed.
-- Events supports submitted keyword, category, city, and two-letter country-code filters. Search requests go to Ticketmaster; clear filters restores the unfiltered upcoming list. Applied filters stay in Redux when navigating to details and back. Newer searches take precedence over older responses, and retries preserve the applied filters.
-- Results show 20 events per page with Previous/Next controls, page numbers, and total matches. Searches and clearing filters restart at page 1; retries retain the requested page, and detail navigation preserves the current results. Pagination preserves the upcoming-date cutoff across pages. Ticketmaster permits access to the first 1,000 matches, so large result sets show a prompt to narrow the filters.
+For a feature-to-source map, see [Implementation reference](REQUIREMENTS.md).
 
-API reference: https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/
+### Routes
+
+| Path | View | Access |
+| --- | --- | --- |
+| `/` | Redirect to event discovery | Public |
+| `/events` | Discovery, search, filters, and pagination | Public |
+| `/events/:id` | Event details and registration controls | Public; registration requires login |
+| `/register` | Account creation | Signed-out users |
+| `/login` | Login and return to the requested destination | Signed-out users |
+| `/my-events` | Personal registrations | Requires login |
+| Any unmatched path | Not Found with a return link | Public |
+
+## Account and registration behavior
+
+- **New accounts:** valid `@gmail.com` addresses only. Case and surrounding spaces are normalized. Dotted and `+tag` variants are matched to prevent duplicate accounts.
+- **Names:** Unicode letters are supported, extra spaces are normalized, and the maximum length is 80 characters. Numeric-only names and hidden/control characters are rejected.
+- **Passwords:** 8-128 characters, at least one letter or number, and at least one special character. Leading/trailing whitespace, hidden/control characters, and all-symbol passwords are rejected. Confirmation must match.
+- **Existing accounts:** previously created non-Gmail accounts remain accessible; new signup strength rules are not reapplied to existing login passwords.
+- **Sessions and registrations:** saved in this browser, with separate event registrations for each user. Clearing site storage removes this local data. Data does not synchronize across devices or browser profiles.
+- **Cancellation:** upcoming and undated registrations can be cancelled and registered again. Completed events remain in history.
+- **Schedule groups:** based on saved event dates. Known end timestamps take precedence over start timestamps; date-only events stay upcoming through the venue's local calendar day. Later provider schedule changes are not automatically synchronized into saved registrations.
+
+## Scope and deployment notes
+
+Gather currently runs entirely in the browser. Its account system demonstrates frontend authentication; salted password hashing and protected routes do not provide server-enforced identity or authorization. Use demo credentials. Email validation checks syntax and domain, not mailbox ownership; there is no OTP or email verification service.
+
+Event registrations are local application records. They **do not reserve or purchase Ticketmaster tickets**.
+
+Vite embeds `VITE_` variables into the browser build, so the Ticketmaster key is visible to visitors even though `.env` is excluded from Git. A deployment that needs a private provider key should route requests through a backend or serverless proxy. Set the environment variable before building; changing it requires a rebuild.
+
+For static hosting, publish the contents of `dist/` and configure a fallback to `index.html` for client-side routes such as `/events/:id`. Serve deployed builds over HTTPS for Web Crypto support. `npm run preview` is for checking builds locally.
+
+Ticketmaster pagination is bounded to the first 1,000 matches. Gather limits navigation accordingly and prompts you to narrow broad searches. See the [Discovery API documentation](https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/) for provider behavior.
+
+## Testing
+
+```sh
+npm test
+npm run lint
+npm run build
+```
+
+The current suite contains **55 automated tests**, covering validation, session restoration, Gmail aliases, duplicate signup, user isolation, registration/cancellation persistence, schedule boundaries, malformed storage, API errors, filters, pagination, and stale responses.
+
+Tests use isolated storage and mocked API responses; they do not require your API key or modify your browser's real accounts. Live Ticketmaster requests have also been checked separately. Component render checks have covered the primary pages.
+
+Manual browser interactions and mobile visual verification remain pending. See the [QA checklist](QA.md) for the complete review flow and viewport sizes.
+
+## Troubleshooting
+
+| Problem | What to check |
+| --- | --- |
+| Events are not configured | Confirm `.env` is beside `package.json`, the variable name matches `.env.example`, and the server was restarted. |
+| Event authorization fails | Check the Consumer Key in your Ticketmaster developer account. |
+| Rate-limit message | Wait before retrying and avoid rapid repeated searches. |
+| No results | Clear filters, try a broader keyword, or change the city/country. Event coverage varies by location. |
+| Login or registrations disappear | Use the same browser profile and site origin. Clearing site storage removes browser-local data. |
+| Saving an account or registration fails | Check whether browser storage is blocked or full. |
+| A deployed page fails on refresh | Configure your host's single-page-application fallback to `index.html`. |
+| Password hashing is unavailable | Use localhost for development or HTTPS for deployment. |

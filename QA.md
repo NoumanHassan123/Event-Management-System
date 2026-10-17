@@ -6,7 +6,7 @@ The automated suite covers authentication, session restoration, duplicate and pe
 
 ## Browser checklist
 
-Actual browser and mobile visual checks are pending: no connected browser was available in the agent session.
+Manual browser interactions and mobile visual verification are pending. The checks below are the release review checklist.
 
 - Start `npm run dev` and visit the printed localhost URL.
 - Visit My Registrations while logged out; confirm login is required.

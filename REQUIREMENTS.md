@@ -1,6 +1,6 @@
-# Assignment implementation review
+# Project implementation reference
 
-This maps the assignment requirements to the current source. An implementation entry is not a claim that manual browser verification has passed; see [QA.md](QA.md) for that remaining work.
+This maps Gather's features to their source files. Implementation coverage and manual browser verification are tracked separately; see [QA.md](QA.md) for the remaining review checklist.
 
 | Requirement | Implementation |
 | --- | --- |
@@ -19,10 +19,10 @@ This maps the assignment requirements to the current source. An implementation e
 | API key configuration excluded from Git | `.env.example` and `.gitignore`; real key stays in ignored `.env` |
 | Setup instructions and regular commits | `README.md` and repository history |
 
-## Before submission
+## Release checks
 
 1. Complete the browser/mobile checklist in `QA.md`.
-2. Confirm the instructor can access the GitHub repository. Visibility/access has not been verified by the agent.
-3. Submit the repository URL: https://github.com/NoumanHassan123/Event-Management-System
+2. Configure the Ticketmaster environment variable for the target environment.
+3. Verify direct navigation and refresh on client-side routes before publishing a deployment.
 
 Authentication and event registrations are frontend simulations stored per browser. Registrations do not reserve or purchase Ticketmaster tickets. My Events groups use saved event schedules, so later provider changes are not automatically synchronized.
