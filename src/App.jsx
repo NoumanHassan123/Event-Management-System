@@ -1,4 +1,5 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
+import Navbar from './components/Navbar.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import Events from './pages/Events.jsx'
@@ -7,17 +8,20 @@ import MyEvents from './pages/MyEvents.jsx'
 
 function App() {
   return (
-    <main>
-      <Routes>
-        <Route path="/" element={<Navigate to="/events" replace />} />
-        <Route path="/login" element={<Login />} />
-        <Route path="/register" element={<Register />} />
-        <Route path="/events" element={<Events />} />
-        <Route path="/events/:id" element={<EventDetails />} />
-        <Route path="/my-events" element={<MyEvents />} />
-        <Route path="*" element={<h1>Page not found</h1>} />
-      </Routes>
-    </main>
+    <>
+      <Navbar />
+      <main>
+        <Routes>
+          <Route path="/" element={<Navigate to="/events" replace />} />
+          <Route path="/login" element={<Login />} />
+          <Route path="/register" element={<Register />} />
+          <Route path="/events" element={<Events />} />
+          <Route path="/events/:id" element={<EventDetails />} />
+          <Route path="/my-events" element={<MyEvents />} />
+          <Route path="*" element={<h1>Page not found</h1>} />
+        </Routes>
+      </main>
+    </>
   )
 }
 

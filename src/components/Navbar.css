@@ -1,0 +1,41 @@
+.site-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  padding: 20px;
+  border-bottom: 1px solid var(--border);
+  text-align: left;
+}
+
+.site-brand {
+  color: var(--text-h);
+  font-weight: 700;
+  text-decoration: none;
+}
+
+.site-nav {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.site-nav a {
+  display: inline-block;
+  padding: 8px 12px;
+  border-radius: 6px;
+  color: var(--text-h);
+  text-decoration: none;
+}
+
+.site-nav a:hover,
+.site-nav a.active {
+  color: var(--accent);
+  background: var(--accent-bg);
+}
+
+.site-header a:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}
