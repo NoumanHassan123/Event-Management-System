@@ -1,3 +1,5 @@
+import { normalizeEventFilters } from '../utils/eventFilters.js'
+
 async function requestTicketmaster(path, params, { signal, apiKey = import.meta.env?.VITE_TICKETMASTER_API_KEY } = {}) {
   if (!apiKey?.trim()) {
     throw new Error('Events are not configured yet. Please contact the site administrator.')
@@ -40,10 +42,20 @@ async function requestTicketmaster(path, params, { signal, apiKey = import.meta.
 }
 
 export async function getEvents(options = {}) {
+  const filters = normalizeEventFilters(options.filters)
+  if (filters.countryCode && !/^[A-Z]{2}$/.test(filters.countryCode)) {
+    throw new Error('Enter a two-letter country code, such as US, GB, or CA.')
+  }
+  const params = {}
+  if (filters.keyword) params.keyword = filters.keyword
+  if (filters.category) params.classificationName = filters.category
+  if (filters.city) params.city = filters.city
+  if (filters.countryCode) params.countryCode = filters.countryCode
   const data = await requestTicketmaster('events.json', {
     size: '20',
     sort: 'date,asc',
     startDateTime: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+    ...params,
   }, options)
   const events = data?._embedded?.events
   if (events === undefined && data?.page) return []

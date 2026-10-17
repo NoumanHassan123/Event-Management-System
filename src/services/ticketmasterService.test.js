@@ -6,6 +6,49 @@ import eventsReducer, { fetchEvents, fetchEventDetails } from '../features/event
 const originalFetch = globalThis.fetch
 afterEach(() => { globalThis.fetch = originalFetch })
 
+test('search combines normalized keyword, category, city, and country without query injection', async () => {
+  globalThis.fetch = async (input) => {
+    const url = new URL(input)
+    assert.equal(url.searchParams.get('keyword'), 'Jazz & Blues?apikey=other')
+    assert.equal(url.searchParams.get('classificationName'), 'Music')
+    assert.equal(url.searchParams.get('city'), 'London')
+    assert.equal(url.searchParams.get('countryCode'), 'GB')
+    assert.equal(url.searchParams.get('apikey'), 'test-key')
+    return { ok: true, json: async () => ({ page: { totalElements: 0 } }) }
+  }
+  assert.deepEqual(await getEvents({ apiKey: 'test-key', filters: {
+    keyword: ' Jazz & Blues?apikey=other ', category: 'Music', city: ' London ', countryCode: ' gb ',
+  } }), [])
+})
+
+test('cleared filters omit optional query parameters and invalid country is rejected', async () => {
+  globalThis.fetch = async (input) => {
+    const params = new URL(input).searchParams
+    for (const field of ['keyword', 'classificationName', 'city', 'countryCode']) assert.equal(params.has(field), false)
+    return { ok: true, json: async () => ({ page: { totalElements: 0 } }) }
+  }
+  await getEvents({ apiKey: 'test-key', filters: { keyword: ' ', city: ' ', countryCode: ' ', category: 'invalid' } })
+  await assert.rejects(getEvents({ apiKey: 'test-key', filters: { countryCode: 'USA' } }), /two-letter/)
+})
+
+test('new search ignores older success and failure and clearing resets applied filters', () => {
+  let state = eventsReducer(undefined, fetchEvents.pending('old', { keyword: 'old' }))
+  state = eventsReducer(state, fetchEvents.pending('new', { city: ' London ', countryCode: 'gb' }))
+  assert.equal(state.filters.city, 'London')
+  assert.equal(state.filters.countryCode, 'GB')
+  state = eventsReducer(state, fetchEvents.fulfilled([{ id: 'old', name: 'Old event' }], 'old'))
+  assert.equal(state.status, 'loading')
+  assert.deepEqual(state.items, [])
+  state = eventsReducer(state, fetchEvents.rejected(new Error('Old error'), 'old'))
+  assert.equal(state.error, null)
+  const items = [{ id: 'new', name: 'New event' }]
+  state = eventsReducer(state, fetchEvents.fulfilled(items, 'new'))
+  assert.deepEqual(state.items, items)
+  state = eventsReducer(state, fetchEvents.pending('clear', {}))
+  assert.deepEqual(state.filters, { keyword: '', category: '', city: '', countryCode: '' })
+  assert.deepEqual(state.items, [])
+})
+
 test('event details request encodes ID and passes signal', async () => {
   const id = 'example/id?test'
   const event = { id, name: 'Example event', dates: { start: { localDate: '2026-12-01' } } }

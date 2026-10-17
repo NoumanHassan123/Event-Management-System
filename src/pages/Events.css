@@ -56,9 +56,63 @@
   cursor: pointer;
 }
 
-.events-page :is(a, button):focus-visible {
+.events-page :is(a, button, input, select):focus-visible {
   outline: 2px solid var(--accent);
   outline-offset: 3px;
+}
+
+.event-search {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 200px), 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+  text-align: left;
+}
+
+.event-search-field {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  min-width: 0;
+}
+
+.event-search-field label {
+  color: var(--text-h);
+  font-weight: 600;
+}
+
+.event-search :is(input, select) {
+  width: 100%;
+  min-width: 0;
+  box-sizing: border-box;
+  padding: 10px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+}
+
+.event-search-actions {
+  grid-column: 1 / -1;
+  display: flex;
+  flex-wrap: wrap;
+  gap: 12px;
+}
+
+.event-search-actions button {
+  padding: 10px 16px;
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  background: var(--accent-bg);
+  color: var(--text-h);
+  font: inherit;
+  cursor: pointer;
+}
+
+.event-search-summary {
+  margin-bottom: 24px;
+  overflow-wrap: anywhere;
 }
 
 .registration-group {

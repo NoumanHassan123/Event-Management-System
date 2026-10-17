@@ -44,6 +44,7 @@ If PowerShell blocks `npm.ps1`, use `npm.cmd` for these commands.
 - Signed-in users can register from an event details page. Duplicate registrations are blocked and registrations persist separately for each user in Local Storage. My Registrations displays the signed-in user's saved events. These are app registrations, not Ticketmaster ticket reservations or purchases.
 - My Registrations groups saved events into upcoming, completed, and date-to-be-announced sections. Date-only events stay upcoming through the venue's local day; known end timestamps take precedence over start timestamps. These groups use the saved event schedule, rather than live completion tracking.
 - Upcoming and undated registrations can be cancelled. Cancellation persists, updates Redux, and allows re-registration. Completed registrations remain as history and cannot be cancelled; registration for past events is closed.
-- Search/filtering and pagination are upcoming steps.
+- Events supports submitted keyword, category, city, and two-letter country-code filters. Search requests go to Ticketmaster; clear filters restores the unfiltered upcoming list. Applied filters stay in Redux when navigating to details and back. Newer searches take precedence over older responses, and retries preserve the applied filters.
+- Results currently show up to 20 events per search; pagination is an upcoming step.
 
 API reference: https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/
