@@ -166,6 +166,14 @@ Vite embeds `VITE_` variables into the browser build, so the Ticketmaster key is
 
 For static hosting, publish the contents of `dist/` and configure a fallback to `index.html` for client-side routes such as `/events/:id`. Serve deployed builds over HTTPS for Web Crypto support. `npm run preview` is for checking builds locally.
 
+### Vercel
+
+The root `vercel.json` sets the Vite framework, `npm run build`, the `dist` output directory, and the SPA fallback for direct links and page refreshes.
+
+Import this GitHub repository into Vercel, use a compatible Node.js version (22.12+ or 24), and add `VITE_TICKETMASTER_API_KEY` in the project's environment settings before deploying. Select Production and Preview if both deployment types should load event data. Redeploy after changing the key. Local `.env` files are excluded from CLI uploads by `.vercelignore`; `.vercel` account/project metadata is ignored by Git.
+
+After deployment, check `/events`, a real event details URL, `/login`, and `/my-events` directly and on refresh. Then check live event loading and the account/registration flow using the [QA checklist](QA.md).
+
 Ticketmaster pagination is bounded to the first 1,000 matches. Gather limits navigation accordingly and prompts you to narrow broad searches. See the [Discovery API documentation](https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/) for provider behavior.
 
 ## Testing
