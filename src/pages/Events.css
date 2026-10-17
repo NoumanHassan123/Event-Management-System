@@ -60,3 +60,39 @@
   outline: 2px solid var(--accent);
   outline-offset: 3px;
 }
+
+.registration-group {
+  margin-top: 32px;
+  text-align: left;
+}
+
+.registration-group > h2 {
+  margin-bottom: 20px;
+}
+
+.registered-event {
+  min-width: 0;
+}
+
+.registration-actions {
+  margin-top: 12px;
+}
+
+.registration-actions button {
+  padding: 10px 16px;
+  border: 1px solid var(--border);
+  border-radius: 6px;
+  background: var(--bg);
+  color: var(--text-h);
+  font: inherit;
+  cursor: pointer;
+}
+
+.registration-actions button:disabled {
+  opacity: 0.6;
+  cursor: wait;
+}
+
+.registration-actions p {
+  margin-top: 8px;
+}

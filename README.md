@@ -42,6 +42,8 @@ If PowerShell blocks `npm.ps1`, use `npm.cmd` for these commands.
 - Loading, missing configuration, connection errors, invalid credentials, rate limits, and empty results have feedback.
 - `/events/:id` loads event details directly from Ticketmaster, including images, venue dates and times, location, category, status, description, and notes when available. Direct links and refresh work without first visiting the list. Missing events and request errors show feedback and a retry button.
 - Signed-in users can register from an event details page. Duplicate registrations are blocked and registrations persist separately for each user in Local Storage. My Registrations displays the signed-in user's saved events. These are app registrations, not Ticketmaster ticket reservations or purchases.
-- Search/filtering, pagination, registration cancellation, and grouping upcoming/completed registrations are upcoming steps.
+- My Registrations groups saved events into upcoming, completed, and date-to-be-announced sections. Date-only events stay upcoming through the venue's local day; known end timestamps take precedence over start timestamps. These groups use the saved event schedule, rather than live completion tracking.
+- Upcoming and undated registrations can be cancelled. Cancellation persists, updates Redux, and allows re-registration. Completed registrations remain as history and cannot be cancelled; registration for past events is closed.
+- Search/filtering and pagination are upcoming steps.
 
 API reference: https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/

@@ -1,5 +1,5 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { readRegistrations, saveRegistration } from '../../services/registrationService.js'
+import { readRegistrations, saveRegistration, removeRegistration } from '../../services/registrationService.js'
 
 export const loadRegistrations = createAsyncThunk(
   'registrations/load',
@@ -19,6 +19,15 @@ export const registerForEvent = createAsyncThunk(
   },
 )
 
+export const cancelRegistration = createAsyncThunk(
+  'registrations/cancel',
+  (eventId, { getState }) => {
+    const userId = getState().auth.user?.id
+    if (!userId) throw new Error('Please log in to cancel your registration.')
+    return { userId, items: removeRegistration(userId, eventId) }
+  },
+)
+
 const registrationsSlice = createSlice({
   name: 'registrations',
   initialState: { byUser: {} },
@@ -35,6 +44,9 @@ const registrationsSlice = createSlice({
         state.byUser[action.meta.arg] = { items: [], status: 'failed', error: action.error.message }
       })
       .addCase(registerForEvent.fulfilled, (state, action) => {
+        state.byUser[action.payload.userId] = { items: action.payload.items, status: 'succeeded', error: null }
+      })
+      .addCase(cancelRegistration.fulfilled, (state, action) => {
         state.byUser[action.payload.userId] = { items: action.payload.items, status: 'succeeded', error: null }
       })
   },

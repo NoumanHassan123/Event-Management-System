@@ -2,6 +2,7 @@ import { useEffect, useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useLocation } from 'react-router-dom'
 import { loadRegistrations, registerForEvent } from '../features/registrations/registrationsSlice.js'
+import { getEventGroup } from '../utils/eventSchedule.js'
 
 export default function EventRegistration({ event }) {
   const user = useSelector((state) => state.auth.user)
@@ -35,6 +36,9 @@ export default function EventRegistration({ event }) {
   const isRegistered = registrations?.items.some((item) => item.event.id === event.id)
   if (isRegistered) {
     return <p role="status">You are registered for this event. <Link to="/my-events">View my registrations</Link></p>
+  }
+  if (getEventGroup(event) === 'completed') {
+    return <p>Registration is closed for this past event.</p>
   }
   if (registrations?.status === 'failed') {
     return (

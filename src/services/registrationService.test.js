@@ -1,8 +1,8 @@
 import assert from 'node:assert/strict'
 import { beforeEach, test } from 'node:test'
 import { configureStore } from '@reduxjs/toolkit'
-import { readRegistrations, saveRegistration } from './registrationService.js'
-import registrationsReducer, { loadRegistrations, registerForEvent } from '../features/registrations/registrationsSlice.js'
+import { readRegistrations, saveRegistration, removeRegistration } from './registrationService.js'
+import registrationsReducer, { loadRegistrations, registerForEvent, cancelRegistration } from '../features/registrations/registrationsSlice.js'
 
 let storage
 beforeEach(() => {
@@ -80,4 +80,43 @@ test('Redux registration blocks duplicates and new store restores persisted item
   const otherUser = createStore('user-b')
   await otherUser.dispatch(loadRegistrations('user-b')).unwrap()
   assert.equal(otherUser.getState().registrations.byUser['user-b'].items.length, 0)
+})
+
+test('cancellation persists, preserves other events and users, and allows registration again', () => {
+  saveRegistration('user-a', event)
+  saveRegistration('user-a', { ...event, id: 'event-2' })
+  saveRegistration('user-b', event)
+  const updated = removeRegistration('user-a', event.id)
+  assert.deepEqual(updated.map((item) => item.event.id), ['event-2'])
+  assert.deepEqual(readRegistrations('user-a'), updated)
+  assert.equal(readRegistrations('user-b').length, 1)
+  assert.throws(() => removeRegistration('user-a', event.id), /could not be found/)
+  assert.equal(saveRegistration('user-a', event).length, 2)
+})
+
+test('completed events cannot be registered or cancelled', () => {
+  const past = { ...event, dates: { start: { dateTime: '2020-01-01T12:00:00Z' } } }
+  assert.throws(() => saveRegistration('user-a', past), /closed/)
+  storage.set('ems.registrations.user-a', JSON.stringify([{ event: past }]))
+  assert.throws(() => removeRegistration('user-a', past.id), /completed events/)
+  assert.equal(readRegistrations('user-a').length, 1)
+})
+
+test('failed cancellation leaves persisted registrations unchanged', () => {
+  const items = saveRegistration('user-a', event)
+  localStorage.setItem = () => { throw new Error('Storage blocked') }
+  assert.throws(() => removeRegistration('user-a', event.id), /cancellation could not be saved/)
+  assert.deepEqual(readRegistrations('user-a'), items)
+})
+
+test('Redux cancellation updates current user, rejects guests and restores removal on reload', async () => {
+  const store = createStore()
+  await store.dispatch(registerForEvent(event)).unwrap()
+  await store.dispatch(cancelRegistration(event.id)).unwrap()
+  assert.deepEqual(store.getState().registrations.byUser['user-a'].items, [])
+  const restored = createStore()
+  await restored.dispatch(loadRegistrations('user-a')).unwrap()
+  assert.deepEqual(restored.getState().registrations.byUser['user-a'].items, [])
+  const guest = createStore(null)
+  await assert.rejects(guest.dispatch(cancelRegistration(event.id)).unwrap(), { message: /log in/ })
 })
