@@ -40,6 +40,7 @@ If PowerShell blocks `npm.ps1`, use `npm.cmd` for these commands.
 - `/my-events` requires login and returns the user there after sign-in.
 - `/events` requests up to 20 upcoming events, ordered by date, and displays images, categories, venue dates, and locations.
 - Loading, missing configuration, connection errors, invalid credentials, rate limits, and empty results have feedback.
-- `/events/:id` currently displays an event ID placeholder. Full event details, search/filtering, pagination, and event registrations are upcoming steps.
+- `/events/:id` loads event details directly from Ticketmaster, including images, venue dates and times, location, category, status, description, and notes when available. Direct links and refresh work without first visiting the list. Missing events and request errors show feedback and a retry button.
+- Search/filtering, pagination, and event registrations are upcoming steps.
 
 API reference: https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/

@@ -1,14 +1,12 @@
-export async function getEvents({ signal, apiKey = import.meta.env?.VITE_TICKETMASTER_API_KEY } = {}) {
+async function requestTicketmaster(path, params, { signal, apiKey = import.meta.env?.VITE_TICKETMASTER_API_KEY } = {}) {
   if (!apiKey?.trim()) {
     throw new Error('Events are not configured yet. Please contact the site administrator.')
   }
 
-  const url = new URL('https://app.ticketmaster.com/discovery/v2/events.json')
+  const url = new URL(`https://app.ticketmaster.com/discovery/v2/${path}`)
   url.search = new URLSearchParams({
     apikey: apiKey.trim(),
-    size: '20',
-    sort: 'date,asc',
-    startDateTime: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+    ...params,
   }).toString()
 
   let response
@@ -20,6 +18,9 @@ export async function getEvents({ signal, apiKey = import.meta.env?.VITE_TICKETM
   }
 
   if (!response.ok) {
+    if (response.status === 404) {
+      throw new Error('This event could not be found. It may no longer be available.')
+    }
     if (response.status === 401 || response.status === 403) {
       throw new Error('The events service could not authorize this request. Please contact the site administrator.')
     }
@@ -35,10 +36,28 @@ export async function getEvents({ signal, apiKey = import.meta.env?.VITE_TICKETM
   } catch {
     throw new Error('The events service returned an unreadable response. Please try again later.')
   }
+  return data
+}
+
+export async function getEvents(options = {}) {
+  const data = await requestTicketmaster('events.json', {
+    size: '20',
+    sort: 'date,asc',
+    startDateTime: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+  }, options)
   const events = data?._embedded?.events
   if (events === undefined && data?.page) return []
   if (!Array.isArray(events) || events.some((event) => !event?.id || !event?.name)) {
     throw new Error('The events service returned an unexpected response. Please try again later.')
   }
   return events
+}
+
+export async function getEventDetails(id, options = {}) {
+  if (typeof id !== 'string' || !id.trim()) throw new Error('An event ID is required.')
+  const data = await requestTicketmaster(`events/${encodeURIComponent(id)}.json`, {}, options)
+  if (data?.id !== id || typeof data?.name !== 'string' || !data.name) {
+    throw new Error('The events service returned unexpected event details. Please try again later.')
+  }
+  return data
 }
