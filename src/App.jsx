@@ -1,5 +1,6 @@
 import { Navigate, Route, Routes } from 'react-router-dom'
 import Navbar from './components/Navbar.jsx'
+import ProtectedRoute from './components/ProtectedRoute.jsx'
 import Login from './pages/Login.jsx'
 import Register from './pages/Register.jsx'
 import Events from './pages/Events.jsx'
@@ -17,7 +18,9 @@ function App() {
           <Route path="/register" element={<Register />} />
           <Route path="/events" element={<Events />} />
           <Route path="/events/:id" element={<EventDetails />} />
-          <Route path="/my-events" element={<MyEvents />} />
+          <Route element={<ProtectedRoute />}>
+            <Route path="/my-events" element={<MyEvents />} />
+          </Route>
           <Route path="*" element={<h1>Page not found</h1>} />
         </Routes>
       </main>

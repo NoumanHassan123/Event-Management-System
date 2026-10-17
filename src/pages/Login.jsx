@@ -1,6 +1,6 @@
 import { useState } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-import { Link, Navigate, useNavigate } from 'react-router-dom'
+import { Link, Navigate, useLocation } from 'react-router-dom'
 import { login } from '../features/auth/authSlice.js'
 import './Auth.css'
 
@@ -8,10 +8,14 @@ export default function Login() {
   const [message, setMessage] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
   const dispatch = useDispatch()
-  const navigate = useNavigate()
+  const location = useLocation()
   const user = useSelector((state) => state.auth.user)
+  const from = location.state?.from
+  const destination = from?.pathname === '/my-events'
+    ? { pathname: from.pathname, search: from.search, hash: from.hash }
+    : '/events'
 
-  if (user) return <Navigate to="/events" replace />
+  if (user) return <Navigate to={destination} replace />
 
   async function handleSubmit(event) {
     event.preventDefault()
@@ -21,7 +25,6 @@ export default function Login() {
     setIsSubmitting(true)
     try {
       await dispatch(login({ email: values.get('email'), password: values.get('password') })).unwrap()
-      navigate('/events', { replace: true })
     } catch (error) {
       setMessage(error.message || 'Login failed. Please try again.')
     } finally {
@@ -32,6 +35,9 @@ export default function Login() {
   return (
     <section className="auth-page" aria-labelledby="login-heading">
       <h1 id="login-heading">Login</h1>
+      {from?.pathname === '/my-events' && (
+        <p className="auth-note">Please log in to view your registrations.</p>
+      )}
       <p className="auth-note">Use the account you created in this browser.</p>
       <form className="auth-form" onSubmit={handleSubmit} onChange={() => setMessage('')}>
         <div className="auth-field">
