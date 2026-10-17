@@ -1,13 +1,18 @@
 import { createAsyncThunk, createSlice } from '@reduxjs/toolkit'
-import { getEvents, getEventDetails } from '../../services/ticketmasterService.js'
+import { getEventsPage, getEventDetails } from '../../services/ticketmasterService.js'
 import { normalizeEventFilters } from '../../utils/eventFilters.js'
 
 export const fetchEvents = createAsyncThunk(
   'events/fetchEvents',
-  (filters, { signal }) => getEvents({ signal, filters }),
+  (query, { signal, getState }) => {
+    const page = query?.page ?? 0
+    return getEventsPage({ signal, filters: query, page,
+      startDateTime: page > 0 ? getState().events.startDateTime : undefined })
+  },
   { condition: (filters, { getState }) => {
     const events = getState().events
     return events.status !== 'loading'
+      || events.page !== (filters?.page ?? 0)
       || JSON.stringify(events.filters) !== JSON.stringify(normalizeEventFilters(filters))
   } },
 )
@@ -23,6 +28,7 @@ const eventsSlice = createSlice({
   initialState: {
     items: [], status: 'idle', error: null, details: {},
     filters: normalizeEventFilters(), currentRequestId: null,
+    page: 0, pagination: null, startDateTime: null,
   },
   reducers: {},
   extraReducers: (builder) => {
@@ -32,11 +38,16 @@ const eventsSlice = createSlice({
         state.error = null
         state.items = []
         state.filters = normalizeEventFilters(action.meta.arg)
+        state.page = action.meta.arg?.page ?? 0
+        state.pagination = null
+        if (state.page === 0) state.startDateTime = null
         state.currentRequestId = action.meta.requestId
       })
       .addCase(fetchEvents.fulfilled, (state, action) => {
         if (state.currentRequestId !== action.meta.requestId) return
-        state.items = action.payload
+        state.items = action.payload.events
+        state.pagination = action.payload.pagination
+        state.startDateTime = action.payload.startDateTime
         state.status = 'succeeded'
         state.currentRequestId = null
       })

@@ -45,6 +45,6 @@ If PowerShell blocks `npm.ps1`, use `npm.cmd` for these commands.
 - My Registrations groups saved events into upcoming, completed, and date-to-be-announced sections. Date-only events stay upcoming through the venue's local day; known end timestamps take precedence over start timestamps. These groups use the saved event schedule, rather than live completion tracking.
 - Upcoming and undated registrations can be cancelled. Cancellation persists, updates Redux, and allows re-registration. Completed registrations remain as history and cannot be cancelled; registration for past events is closed.
 - Events supports submitted keyword, category, city, and two-letter country-code filters. Search requests go to Ticketmaster; clear filters restores the unfiltered upcoming list. Applied filters stay in Redux when navigating to details and back. Newer searches take precedence over older responses, and retries preserve the applied filters.
-- Results currently show up to 20 events per search; pagination is an upcoming step.
+- Results show 20 events per page with Previous/Next controls, page numbers, and total matches. Searches and clearing filters restart at page 1; retries retain the requested page, and detail navigation preserves the current results. Pagination preserves the upcoming-date cutoff across pages. Ticketmaster permits access to the first 1,000 matches, so large result sets show a prompt to narrow the filters.
 
 API reference: https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/

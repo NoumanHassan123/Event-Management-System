@@ -41,7 +41,15 @@ async function requestTicketmaster(path, params, { signal, apiKey = import.meta.
   return data
 }
 
-export async function getEvents(options = {}) {
+export const EVENTS_PAGE_SIZE = 20
+export const MAX_EVENT_PAGES = 50
+
+export async function getEventsPage(options = {}) {
+  const page = options.page ?? 0
+  if (!Number.isInteger(page) || page < 0 || page >= MAX_EVENT_PAGES) {
+    throw new Error('This results page is unavailable. Please narrow your search.')
+  }
+  const startDateTime = options.startDateTime || new Date().toISOString().replace(/\.\d{3}Z$/, 'Z')
   const filters = normalizeEventFilters(options.filters)
   if (filters.countryCode && !/^[A-Z]{2}$/.test(filters.countryCode)) {
     throw new Error('Enter a two-letter country code, such as US, GB, or CA.')
@@ -52,17 +60,31 @@ export async function getEvents(options = {}) {
   if (filters.city) params.city = filters.city
   if (filters.countryCode) params.countryCode = filters.countryCode
   const data = await requestTicketmaster('events.json', {
-    size: '20',
+    size: String(EVENTS_PAGE_SIZE),
+    page: String(page),
     sort: 'date,asc',
-    startDateTime: new Date().toISOString().replace(/\.\d{3}Z$/, 'Z'),
+    startDateTime,
     ...params,
   }, options)
-  const events = data?._embedded?.events
-  if (events === undefined && data?.page) return []
+  const events = data?._embedded?.events ?? (data?.page ? [] : undefined)
   if (!Array.isArray(events) || events.some((event) => !event?.id || !event?.name)) {
     throw new Error('The events service returned an unexpected response. Please try again later.')
   }
-  return events
+  const totalElements = data.page?.totalElements ?? events.length
+  const totalPages = data.page?.totalPages ?? (events.length ? page + 1 : 0)
+  const number = data.page?.number ?? page
+  if (![totalElements, totalPages, number].every((value) => Number.isInteger(value) && value >= 0) || number !== page) {
+    throw new Error('The events service returned unexpected pagination data. Please try again later.')
+  }
+  return {
+    events, startDateTime,
+    pagination: { number, totalElements, totalPages: Math.min(totalPages, MAX_EVENT_PAGES),
+      limited: totalPages > MAX_EVENT_PAGES },
+  }
+}
+
+export async function getEvents(options = {}) {
+  return (await getEventsPage(options)).events
 }
 
 export async function getEventDetails(id, options = {}) {

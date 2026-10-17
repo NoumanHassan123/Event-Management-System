@@ -7,12 +7,12 @@ import './Events.css'
 
 export default function Events() {
   const dispatch = useDispatch()
-  const { items, status, error, filters } = useSelector((state) => state.events)
+  const { items, status, error, filters, page, pagination } = useSelector((state) => state.events)
   const [draft, setDraft] = useState(filters)
 
   useEffect(() => {
-    if (status === 'idle') dispatch(fetchEvents(filters))
-  }, [dispatch, status, filters])
+    if (status === 'idle') dispatch(fetchEvents({ ...filters, page }))
+  }, [dispatch, status, filters, page])
 
   function handleChange(event) {
     const { name, value } = event.target
@@ -72,7 +72,8 @@ export default function Events() {
       {status === 'failed' && (
         <div className="events-feedback">
           <p role="alert">{error}</p>
-          <button type="button" onClick={() => dispatch(fetchEvents(filters))}>Try again</button>
+          <button type="button" onClick={() => dispatch(fetchEvents({ ...filters, page }))}>Try again</button>
+          {page > 0 && <button type="button" onClick={() => dispatch(fetchEvents({ ...filters, page: page - 1 }))}>Previous page</button>}
         </div>
       )}
       {status === 'succeeded' && (items.length ? (
@@ -80,6 +81,16 @@ export default function Events() {
           {items.map((event) => <EventCard key={event.id} event={event} />)}
         </div>
       ) : <p role="status">No upcoming events match your search. Try different filters or clear them.</p>)}
+      {status === 'succeeded' && pagination && (items.length > 0 || page > 0) && (
+        <nav className="events-pagination" aria-label="Event results pages">
+          <button type="button" disabled={page === 0}
+            onClick={() => dispatch(fetchEvents({ ...filters, page: page - 1 }))}>Previous</button>
+          <p role="status">Page {page + 1} of {Math.max(page + 1, pagination.totalPages)} · {pagination.totalElements} events found</p>
+          <button type="button" disabled={page + 1 >= pagination.totalPages}
+            onClick={() => dispatch(fetchEvents({ ...filters, page: page + 1 }))}>Next</button>
+          {pagination.limited && <p className="pagination-hint">Showing the first 1,000 matches. Narrow your filters to explore more results.</p>}
+        </nav>
+      )}
     </section>
   )
 }

@@ -1,6 +1,6 @@
 import assert from 'node:assert/strict'
 import { test, afterEach } from 'node:test'
-import { getEvents, getEventDetails } from './ticketmasterService.js'
+import { getEvents, getEventsPage, getEventDetails } from './ticketmasterService.js'
 import eventsReducer, { fetchEvents, fetchEventDetails } from '../features/events/eventsSlice.js'
 
 const originalFetch = globalThis.fetch
@@ -42,7 +42,7 @@ test('new search ignores older success and failure and clearing resets applied f
   state = eventsReducer(state, fetchEvents.rejected(new Error('Old error'), 'old'))
   assert.equal(state.error, null)
   const items = [{ id: 'new', name: 'New event' }]
-  state = eventsReducer(state, fetchEvents.fulfilled(items, 'new'))
+  state = eventsReducer(state, fetchEvents.fulfilled({ events: items }, 'new'))
   assert.deepEqual(state.items, items)
   state = eventsReducer(state, fetchEvents.pending('clear', {}))
   assert.deepEqual(state.filters, { keyword: '', category: '', city: '', countryCode: '' })
@@ -148,7 +148,71 @@ test('Redux handles loading, success, and retry after errors', () => {
   const retry = eventsReducer(failure, fetchEvents.pending('request-2'))
   assert.equal(retry.error, null)
   const events = [{ id: '1', name: 'Example' }]
-  const success = eventsReducer(retry, fetchEvents.fulfilled(events, 'request-2'))
+  const success = eventsReducer(retry, fetchEvents.fulfilled({ events }, 'request-2'))
   assert.equal(success.status, 'succeeded')
   assert.deepEqual(success.items, events)
+})
+
+test('page requests keep filters and cutoff, and expose capped pagination metadata', async () => {
+  const cutoff = '2026-10-17T12:00:00Z'
+  const events = [{ id: 'page-two', name: 'Second page event' }]
+  globalThis.fetch = async (input) => {
+    const params = new URL(input).searchParams
+    assert.equal(params.get('page'), '1')
+    assert.equal(params.get('size'), '20')
+    assert.equal(params.get('keyword'), 'jazz')
+    assert.equal(params.get('countryCode'), 'GB')
+    assert.equal(params.get('startDateTime'), cutoff)
+    return { ok: true, json: async () => ({ _embedded: { events }, page: { number: 1, totalPages: 200, totalElements: 4000 } }) }
+  }
+  const result = await getEventsPage({ apiKey: 'test-key', page: 1,
+    filters: { keyword: 'jazz', countryCode: 'GB' }, startDateTime: cutoff })
+  assert.deepEqual(result.events, events)
+  assert.equal(result.startDateTime, cutoff)
+  assert.deepEqual(result.pagination, { number: 1, totalPages: 50, totalElements: 4000, limited: true })
+})
+
+test('invalid page indexes fail before fetching and mismatched response pages fail clearly', async () => {
+  globalThis.fetch = () => { throw new Error('Should not fetch') }
+  for (const page of [-1, 50, 1.5, '1']) {
+    await assert.rejects(getEventsPage({ apiKey: 'test-key', page }), /page is unavailable/)
+  }
+  globalThis.fetch = async () => ({ ok: true, json: async () => ({ page: { number: 0, totalPages: 2, totalElements: 21 } }) })
+  await assert.rejects(getEventsPage({ apiKey: 'test-key', page: 1 }), /pagination data/)
+})
+
+test('last page and empty searches expose correct pagination', async () => {
+  globalThis.fetch = async () => ({ ok: true, json: async () => ({
+    _embedded: { events: [{ id: 'last', name: 'Last event' }] },
+    page: { number: 1, totalPages: 2, totalElements: 21 },
+  }) })
+  const last = await getEventsPage({ apiKey: 'test-key', page: 1 })
+  assert.equal(last.pagination.totalPages, 2)
+  assert.equal(last.pagination.limited, false)
+  globalThis.fetch = async () => ({ ok: true, json: async () => ({ page: { number: 0, totalPages: 0, totalElements: 0 } }) })
+  const empty = await getEventsPage({ apiKey: 'test-key' })
+  assert.deepEqual(empty.events, [])
+  assert.equal(empty.pagination.totalPages, 0)
+})
+
+test('Redux tracks requested page, preserves filters, ignores stale page responses, and resets on new search', () => {
+  let state = eventsReducer(undefined, fetchEvents.pending('first', { keyword: 'jazz' }))
+  const first = { events: [{ id: 'first', name: 'First' }], startDateTime: '2026-10-17T12:00:00Z',
+    pagination: { number: 0, totalPages: 3, totalElements: 45, limited: false } }
+  state = eventsReducer(state, fetchEvents.fulfilled(first, 'first'))
+  state = eventsReducer(state, fetchEvents.pending('second', { keyword: 'jazz', page: 1 }))
+  assert.equal(state.page, 1)
+  assert.equal(state.startDateTime, first.startDateTime)
+  assert.equal(state.filters.keyword, 'jazz')
+  state = eventsReducer(state, fetchEvents.fulfilled(first, 'first'))
+  assert.equal(state.status, 'loading')
+  assert.deepEqual(state.items, [])
+  state = eventsReducer(state, fetchEvents.rejected(new Error('Network failed'), 'second'))
+  assert.equal(state.page, 1)
+  assert.equal(state.status, 'failed')
+  state = eventsReducer(state, fetchEvents.pending('search', { city: 'London' }))
+  assert.equal(state.page, 0)
+  assert.equal(state.startDateTime, null)
+  assert.equal(state.filters.keyword, '')
+  assert.equal(state.filters.city, 'London')
 })

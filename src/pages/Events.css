@@ -110,6 +110,35 @@
   cursor: pointer;
 }
 
+.events-pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 16px;
+  margin-top: 28px;
+}
+
+.events-pagination button {
+  padding: 10px 16px;
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  background: var(--accent-bg);
+  color: var(--text-h);
+  font: inherit;
+  cursor: pointer;
+}
+
+.events-pagination button:disabled {
+  opacity: 0.5;
+  cursor: default;
+}
+
+.pagination-hint {
+  flex-basis: 100%;
+  font-size: 0.85rem;
+}
+
 .event-search-summary {
   margin-bottom: 24px;
   overflow-wrap: anywhere;
