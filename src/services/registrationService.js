@@ -1,5 +1,15 @@
+import { getEventGroup } from '../utils/eventSchedule.js'
+
+function isStoredEvent(event) {
+  return event && typeof event.id === 'string' && Boolean(event.id.trim())
+    && typeof event.name === 'string' && Boolean(event.name.trim())
+    && (event.images === undefined || Array.isArray(event.images))
+    && (event.classifications === undefined || Array.isArray(event.classifications))
+    && (event._embedded?.venues === undefined || Array.isArray(event._embedded.venues))
+}
+
 function storageKey(userId) {
-  if (!userId) throw new Error('Please log in to manage your registrations.')
+  if (typeof userId !== 'string' || !userId.trim()) throw new Error('Please log in to manage your registrations.')
   return `ems.registrations.${userId}`
 }
 
@@ -7,7 +17,7 @@ export function readRegistrations(userId) {
   const key = storageKey(userId)
   try {
     const items = JSON.parse(localStorage.getItem(key) ?? '[]')
-    if (!Array.isArray(items) || items.some((item) => !item?.event?.id || !item?.event?.name)) {
+    if (!Array.isArray(items) || items.some((item) => !isStoredEvent(item?.event))) {
       throw new Error('Invalid registrations')
     }
     return items
@@ -18,7 +28,7 @@ export function readRegistrations(userId) {
 
 export function saveRegistration(userId, event) {
   const items = readRegistrations(userId)
-  if (!event?.id || !event?.name) throw new Error('Please select a valid event.')
+  if (!isStoredEvent(event)) throw new Error('Please select a valid event.')
   if (items.some((item) => item.event.id === event.id)) {
     throw new Error('You are already registered for this event.')
   }
@@ -38,9 +48,6 @@ export function saveRegistration(userId, event) {
   }
   return updated
 }
-import { getEventGroup } from '../utils/eventSchedule.js'
-
-
 export function removeRegistration(userId, eventId) {
   const items = readRegistrations(userId)
   const registration = items.find((item) => item.event.id === eventId)

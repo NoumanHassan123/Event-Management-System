@@ -66,7 +66,8 @@ export async function getEventsPage(options = {}) {
     startDateTime,
     ...params,
   }, options)
-  const events = data?._embedded?.events ?? (data?.page ? [] : undefined)
+  const receivedEvents = data?._embedded?.events
+  const events = receivedEvents === undefined && data?.page ? [] : receivedEvents
   if (!Array.isArray(events) || events.some((event) => !event?.id || !event?.name)) {
     throw new Error('The events service returned an unexpected response. Please try again later.')
   }

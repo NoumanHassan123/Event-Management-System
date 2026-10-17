@@ -6,6 +6,7 @@ import { getAuthDestination } from '../utils/authDestination.js'
 import PasswordInput from '../components/PasswordInput.jsx'
 import AuthLayout from '../components/AuthLayout.jsx'
 import Icon from '../components/Icon.jsx'
+import { getLoginErrors, normalizeEmail } from '../utils/authValidation.js'
 import './Auth.css'
 
 export default function Login() {
@@ -23,7 +24,13 @@ export default function Login() {
   async function handleSubmit(event) {
     event.preventDefault()
     if (isSubmitting) return
-    const values = new FormData(event.currentTarget)
+    const form = event.currentTarget
+    const emailField = form.elements.namedItem('email')
+    emailField.value = normalizeEmail(emailField.value)
+    const values = new FormData(form)
+    const errors = getLoginErrors(Object.fromEntries(values))
+    for (const field of ['email', 'password']) form.elements.namedItem(field).setCustomValidity(errors[field] || '')
+    if (!form.reportValidity()) return
     setMessage('')
     setIsSubmitting(true)
     try {
@@ -43,14 +50,17 @@ export default function Login() {
       {canReturn && from.pathname !== '/my-events' && (
         <p className="auth-note">Please log in to register for this event.</p>
       )}
-      <form className="auth-form" onSubmit={handleSubmit} onChange={() => setMessage('')}>
+      <form className="auth-form" onSubmit={handleSubmit} noValidate onChange={(event) => {
+        setMessage('')
+        for (const field of ['email', 'password']) event.currentTarget.elements.namedItem(field).setCustomValidity('')
+      }}>
         <div className="auth-field">
           <label htmlFor="login-email">Email</label>
-          <input id="login-email" name="email" type="email" autoComplete="email" required />
+          <input id="login-email" name="email" type="email" autoComplete="email" autoCapitalize="none" spellCheck={false} maxLength={254} required />
         </div>
         <div className="auth-field">
           <label htmlFor="login-password">Password</label>
-          <PasswordInput id="login-password" name="password" autoComplete="current-password" required />
+          <PasswordInput id="login-password" name="password" autoComplete="current-password" maxLength={128} required />
         </div>
         <button type="submit" disabled={isSubmitting}>{isSubmitting ? 'Logging in...' : 'Log in'}<Icon name="arrow" size={18} /></button>
         <p className="auth-message" role="status">{message}</p>

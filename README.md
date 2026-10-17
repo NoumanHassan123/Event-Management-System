@@ -40,6 +40,8 @@ See [QA.md](QA.md) for automated test scope and the pending browser/mobile check
 See [REQUIREMENTS.md](REQUIREMENTS.md) for the assignment implementation map and remaining submission checks.
 
 - Registration creates an account in this browser and signs the user in.
+- New registrations accept valid `@gmail.com` addresses only. Email case/outer spaces are normalized; Gmail dot and `+tag` aliases cannot create duplicate accounts. Existing non-Gmail demo accounts retain login access. This validates address syntax/domain, not mailbox ownership.
+- New passwords require 8–128 characters, a letter or number, and at least one special character. Leading/trailing whitespace, hidden/control characters, and all-symbol passwords are rejected. Existing login passwords are not subjected to new signup strength rules. Names support Unicode letters, normalize extra spaces, and are limited to 80 characters.
 - Authentication state uses Redux, with a session restored from Local Storage on refresh.
 - Passwords use salted PBKDF2 hashes. This remains a frontend simulation, not backend authentication; use demo credentials only.
 - `/my-events` requires login and returns the user there after sign-in.

@@ -14,6 +14,18 @@ beforeEach(() => {
 })
 const event = { id: 'event-1', name: 'Example concert', dates: { start: { localDate: '2027-01-01' } } }
 
+test('malformed registration snapshots fail safely without overwriting saved data', () => {
+  for (const invalid of [{ ...event, name: {} }, { ...event, images: {} },
+    { ...event, classifications: 'invalid' }, { ...event, _embedded: { venues: {} } }]) {
+    assert.throws(() => saveRegistration('user-a', invalid), /valid event/)
+    const saved = JSON.stringify([{ event: invalid }])
+    storage.set('ems.registrations.user-a', saved)
+    assert.throws(() => readRegistrations('user-a'), /could not be read/)
+    assert.equal(storage.get('ems.registrations.user-a'), saved)
+    storage.delete('ems.registrations.user-a')
+  }
+})
+
 function createStore(userId = 'user-a') {
   return configureStore({ reducer: {
     auth: (state = { user: userId ? { id: userId } : null }) => state,

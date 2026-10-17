@@ -2,9 +2,22 @@ import assert from 'node:assert/strict'
 import { test, afterEach } from 'node:test'
 import { getEvents, getEventsPage, getEventDetails } from './ticketmasterService.js'
 import eventsReducer, { fetchEvents, fetchEventDetails } from '../features/events/eventsSlice.js'
+import { normalizeEventFilters } from '../utils/eventFilters.js'
 
 const originalFetch = globalThis.fetch
 afterEach(() => { globalThis.fetch = originalFetch })
+
+test('malformed filter values cannot cause trim TypeErrors', () => {
+  const empty = { keyword: '', category: '', city: '', countryCode: '' }
+  for (const filters of [null, 123, [], { keyword: {}, city: 123, countryCode: [] }]) {
+    assert.deepEqual(normalizeEventFilters(filters), empty)
+  }
+})
+
+test('explicitly null event data is an error rather than an empty search result', async () => {
+  globalThis.fetch = async () => ({ ok: true, json: async () => ({ _embedded: { events: null }, page: { totalElements: 12 } }) })
+  await assert.rejects(getEvents({ apiKey: 'test-key' }), /unexpected response/)
+})
 
 test('search combines normalized keyword, category, city, and country without query injection', async () => {
   globalThis.fetch = async (input) => {

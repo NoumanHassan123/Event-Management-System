@@ -1,17 +1,20 @@
+import { emailIdentity, getLoginErrors, getRegistrationErrors, normalizeEmail, normalizeName } from '../utils/authValidation.js'
+
 const USERS_KEY = 'ems.users'
 const SESSION_KEY = 'ems.session'
-const EMAIL_PATTERN = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
 function isProfile(user) {
-  return user && typeof user.id === 'string' && typeof user.name === 'string'
-    && typeof user.email === 'string'
+  return user && typeof user.id === 'string' && Boolean(user.id.trim())
+    && typeof user.name === 'string' && Boolean(user.name.trim())
+    && typeof user.email === 'string' && Boolean(user.email.trim())
 }
 
 function readUsers() {
   try {
     const users = JSON.parse(localStorage.getItem(USERS_KEY) ?? '[]')
     if (!Array.isArray(users) || !users.every((user) => isProfile(user)
-      && typeof user.salt === 'string' && typeof user.passwordHash === 'string')) {
+      && typeof user.salt === 'string' && user.salt.length > 0
+      && typeof user.passwordHash === 'string' && /^[a-f0-9]{64}$/.test(user.passwordHash))) {
       throw new Error('Invalid accounts')
     }
     return users
@@ -57,22 +60,23 @@ export function readSession() {
   }
 }
 
-export async function registerAccount({ name, email, password }) {
-  const normalizedEmail = email.trim().toLowerCase()
-  if (!name.trim() || !EMAIL_PATTERN.test(normalizedEmail) || password.length < 8) {
-    throw new Error('Enter a name, a valid email, and a password with at least 8 characters.')
-  }
-  if (readUsers().some((user) => user.email === normalizedEmail)) {
+export async function registerAccount(values = {}) {
+  const errors = getRegistrationErrors(values)
+  if (Object.keys(errors).length) throw new Error(Object.values(errors)[0])
+  const { name, email, password } = values
+  const normalizedEmail = normalizeEmail(email)
+  const identity = emailIdentity(normalizedEmail)
+  if (readUsers().some((user) => emailIdentity(user.email) === identity)) {
     throw new Error('An account with this email already exists. Please log in.')
   }
   const salt = crypto.randomUUID()
   const passwordHash = await hashPassword(password, salt)
   // Read again after hashing so another completed registration is not overwritten.
   const users = readUsers()
-  if (users.some((user) => user.email === normalizedEmail)) {
+  if (users.some((user) => emailIdentity(user.email) === identity)) {
     throw new Error('An account with this email already exists. Please log in.')
   }
-  const account = { id: crypto.randomUUID(), name: name.trim(), email: normalizedEmail, salt, passwordHash }
+  const account = { id: crypto.randomUUID(), name: normalizeName(name), email: normalizedEmail, salt, passwordHash }
   writeStorage(USERS_KEY, [...users, account])
   try {
     return startSession(account)
@@ -81,8 +85,15 @@ export async function registerAccount({ name, email, password }) {
   }
 }
 
-export async function signIn({ email, password }) {
-  const account = readUsers().find((user) => user.email === email.trim().toLowerCase())
+export async function signIn(values = {}) {
+  const errors = getLoginErrors(values)
+  if (Object.keys(errors).length) throw new Error(Object.values(errors)[0])
+  const { email, password } = values
+  const users = readUsers()
+  const normalizedEmail = normalizeEmail(email)
+  // Prefer exact addresses for legacy accounts that may have shared an alias.
+  const account = users.find((user) => normalizeEmail(user.email) === normalizedEmail)
+    || users.find((user) => emailIdentity(user.email) === emailIdentity(normalizedEmail))
   if (!account || await hashPassword(password, account.salt) !== account.passwordHash) {
     throw new Error('Email or password is incorrect.')
   }

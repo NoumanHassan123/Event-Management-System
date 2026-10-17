@@ -17,7 +17,7 @@ test('account creation, registration, refresh, logout, user isolation, login and
     preloadedState: { auth: { user: readSession() } },
   })
   let store = freshStore()
-  const firstAccount = { name: 'QA First', email: 'first@example.test', password: 'demo-password-123' }
+  const firstAccount = { name: 'QA First', email: 'first@gmail.com', password: 'demo-password-123' }
   const user = await store.dispatch(register(firstAccount)).unwrap()
   const future = new Date(Date.now() + 86400000 * 30).toISOString()
   const event = { id: 'qa-event', name: 'QA Event', dates: { start: { dateTime: future } } }
@@ -30,7 +30,7 @@ test('account creation, registration, refresh, logout, user isolation, login and
   await store.dispatch(logout()).unwrap()
   assert.equal(readSession(), null)
   await assert.rejects(store.dispatch(registerForEvent(event)).unwrap(), { message: /log in/ })
-  const secondUser = await store.dispatch(register({ ...firstAccount, email: 'second@example.test' })).unwrap()
+  const secondUser = await store.dispatch(register({ ...firstAccount, email: 'second@gmail.com' })).unwrap()
   await store.dispatch(loadRegistrations(secondUser.id)).unwrap()
   assert.deepEqual(store.getState().registrations.byUser[secondUser.id].items, [])
   await assert.rejects(store.dispatch(cancelRegistration(event.id)).unwrap(), { message: /could not be found/ })
