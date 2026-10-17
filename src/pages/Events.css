@@ -1,0 +1,62 @@
+.events-page {
+  padding: 20px 24px 40px;
+}
+
+.events-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 280px), 1fr));
+  gap: 24px;
+  text-align: left;
+}
+
+.event-card {
+  overflow: hidden;
+  min-width: 0;
+  border: 1px solid var(--border);
+  border-radius: 10px;
+}
+
+.event-card img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 16 / 9;
+  object-fit: cover;
+}
+
+.event-card-content {
+  padding: 20px;
+  overflow-wrap: anywhere;
+}
+
+.event-card h2 {
+  margin: 8px 0 16px;
+}
+
+.event-card a {
+  color: var(--text-h);
+}
+
+.event-card p + p {
+  margin-top: 8px;
+}
+
+.event-category {
+  color: var(--accent);
+  font-size: 0.85rem;
+}
+
+.events-feedback button {
+  margin-top: 16px;
+  padding: 10px 16px;
+  border: 1px solid var(--accent-border);
+  border-radius: 6px;
+  background: var(--accent-bg);
+  color: var(--text-h);
+  font: inherit;
+  cursor: pointer;
+}
+
+.events-page :is(a, button):focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 3px;
+}

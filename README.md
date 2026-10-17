@@ -1,16 +1,45 @@
-# React + Vite
+# Event Management System
 
-This template provides a minimal setup to get React working in Vite with HMR and some Oxlint rules.
+A React and Redux Toolkit assignment project with browser-based account registration, login, logout, persistent sessions, protected registrations, and upcoming events from Ticketmaster.
 
-Currently, two official plugins are available:
+## Setup
 
-- [@vitejs/plugin-react](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react) uses [Oxc](https://oxc.rs)
-- [@vitejs/plugin-react-swc](https://github.com/vitejs/vite-plugin-react/blob/main/packages/plugin-react-swc) uses [SWC](https://swc.rs/)
+1. Install Node.js compatible with Vite 8 (Node 22.12+ recommended).
+2. Run `npm install`.
+3. Copy `.env.example` to `.env` in the project root:
 
-## React Compiler
+   ```powershell
+   Copy-Item .env.example .env
+   ```
 
-The React Compiler is not enabled on this template because of its impact on dev & build performances. To add it, see [this documentation](https://react.dev/learn/react-compiler/installation).
+4. Get a Ticketmaster Consumer Key (API key) from https://developer.ticketmaster.com/ and enter it locally:
 
-## Expanding the Oxlint configuration
+   ```dotenv
+   VITE_TICKETMASTER_API_KEY=your_consumer_key_here
+   ```
 
-If you are developing a production application, we recommend using TypeScript with type-aware lint rules enabled. Check out the [TS template](https://github.com/vitejs/vite/tree/main/packages/create-vite/template-react-ts) for information on how to integrate TypeScript and Oxlint's TypeScript related rules in your project.
+5. Run `npm run dev` and open the URL printed in the terminal. Restart the dev server after changing `.env`.
+
+Never commit `.env` or a real API key. `.env.example` contains only an empty placeholder. Vite exposes `VITE_` variables to the browser; this frontend integration does not keep the key secret from visitors. A deployed application requiring a private key needs a server proxy.
+
+## Commands
+
+- `npm run dev`: start development server.
+- `npm run build`: build into `dist`.
+- `npm run preview`: preview the build locally.
+- `npm run lint`: run Oxlint.
+- `npm test`: run authentication and Ticketmaster service tests with Node's built-in test runner.
+
+If PowerShell blocks `npm.ps1`, use `npm.cmd` for these commands.
+
+## Current behavior
+
+- Registration creates an account in this browser and signs the user in.
+- Authentication state uses Redux, with a session restored from Local Storage on refresh.
+- Passwords use salted PBKDF2 hashes. This remains a frontend simulation, not backend authentication; use demo credentials only.
+- `/my-events` requires login and returns the user there after sign-in.
+- `/events` requests up to 20 upcoming events, ordered by date, and displays images, categories, venue dates, and locations.
+- Loading, missing configuration, connection errors, invalid credentials, rate limits, and empty results have feedback.
+- `/events/:id` currently displays an event ID placeholder. Full event details, search/filtering, pagination, and event registrations are upcoming steps.
+
+API reference: https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/
