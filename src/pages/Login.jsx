@@ -11,7 +11,8 @@ export default function Login() {
   const location = useLocation()
   const user = useSelector((state) => state.auth.user)
   const from = location.state?.from
-  const destination = from?.pathname === '/my-events'
+  const canReturn = from?.pathname === '/my-events' || /^\/events\/[^/]+$/.test(from?.pathname || '')
+  const destination = canReturn
     ? { pathname: from.pathname, search: from.search, hash: from.hash }
     : '/events'
 
@@ -37,6 +38,9 @@ export default function Login() {
       <h1 id="login-heading">Login</h1>
       {from?.pathname === '/my-events' && (
         <p className="auth-note">Please log in to view your registrations.</p>
+      )}
+      {canReturn && from.pathname !== '/my-events' && (
+        <p className="auth-note">Please log in to register for this event.</p>
       )}
       <p className="auth-note">Use the account you created in this browser.</p>
       <form className="auth-form" onSubmit={handleSubmit} onChange={() => setMessage('')}>

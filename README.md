@@ -28,7 +28,7 @@ Never commit `.env` or a real API key. `.env.example` contains only an empty pla
 - `npm run build`: build into `dist`.
 - `npm run preview`: preview the build locally.
 - `npm run lint`: run Oxlint.
-- `npm test`: run authentication and Ticketmaster service tests with Node's built-in test runner.
+- `npm test`: run authentication, registration, and Ticketmaster service tests with Node's built-in test runner.
 
 If PowerShell blocks `npm.ps1`, use `npm.cmd` for these commands.
 
@@ -41,6 +41,7 @@ If PowerShell blocks `npm.ps1`, use `npm.cmd` for these commands.
 - `/events` requests up to 20 upcoming events, ordered by date, and displays images, categories, venue dates, and locations.
 - Loading, missing configuration, connection errors, invalid credentials, rate limits, and empty results have feedback.
 - `/events/:id` loads event details directly from Ticketmaster, including images, venue dates and times, location, category, status, description, and notes when available. Direct links and refresh work without first visiting the list. Missing events and request errors show feedback and a retry button.
-- Search/filtering, pagination, and event registrations are upcoming steps.
+- Signed-in users can register from an event details page. Duplicate registrations are blocked and registrations persist separately for each user in Local Storage. My Registrations displays the signed-in user's saved events. These are app registrations, not Ticketmaster ticket reservations or purchases.
+- Search/filtering, pagination, registration cancellation, and grouping upcoming/completed registrations are upcoming steps.
 
 API reference: https://developer.ticketmaster.com/products-and-docs/apis/discovery-api/v2/

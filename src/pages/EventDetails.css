@@ -46,7 +46,8 @@
   white-space: pre-line;
 }
 
-.event-details-error button {
+.event-details-error button,
+.event-registration button {
   margin-top: 16px;
   padding: 10px 16px;
   border: 1px solid var(--accent-border);
@@ -55,6 +56,22 @@
   color: var(--text-h);
   font: inherit;
   cursor: pointer;
+}
+
+.event-registration {
+  padding: 20px;
+  border: 1px solid var(--border);
+  border-radius: 8px;
+}
+
+.event-registration button:disabled {
+  opacity: 0.6;
+  cursor: default;
+}
+
+.registration-note {
+  margin-top: 12px;
+  font-size: 0.85rem;
 }
 
 .event-details :is(a, button):focus-visible {

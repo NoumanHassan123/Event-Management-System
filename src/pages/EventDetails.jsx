@@ -2,6 +2,7 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { Link, useParams } from 'react-router-dom'
 import { fetchEventDetails } from '../features/events/eventsSlice.js'
+import EventRegistration from '../components/EventRegistration.jsx'
 import './EventDetails.css'
 
 export default function EventDetails() {
@@ -48,6 +49,9 @@ export default function EventDetails() {
             <div><dt>Category</dt><dd>{category || 'Not specified'}</dd></div>
             {event.dates?.status?.code && <div><dt>Status</dt><dd>{event.dates.status.code}</dd></div>}
           </dl>
+          <section className="event-registration" aria-label="Event registration">
+            <EventRegistration key={`${id}`} event={event} />
+          </section>
           <section className="event-description" aria-labelledby="about-event-heading">
             <h2 id="about-event-heading">About this event</h2>
             <p>{event.info || event.description || 'No description is available for this event.'}</p>
