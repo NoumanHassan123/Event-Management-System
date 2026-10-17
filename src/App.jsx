@@ -6,6 +6,7 @@ import Register from './pages/Register.jsx'
 import Events from './pages/Events.jsx'
 import EventDetails from './pages/EventDetails.jsx'
 import MyEvents from './pages/MyEvents.jsx'
+import NotFound from './pages/NotFound.jsx'
 
 function App() {
   return (
@@ -21,7 +22,7 @@ function App() {
           <Route element={<ProtectedRoute />}>
             <Route path="/my-events" element={<MyEvents />} />
           </Route>
-          <Route path="*" element={<h1>Page not found</h1>} />
+          <Route path="*" element={<NotFound />} />
         </Routes>
       </main>
     </>

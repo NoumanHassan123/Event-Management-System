@@ -3,6 +3,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { Link, useParams } from 'react-router-dom'
 import { fetchEventDetails } from '../features/events/eventsSlice.js'
 import EventRegistration from '../components/EventRegistration.jsx'
+import { getEventScheduleLabels } from '../utils/eventDisplay.js'
 import './EventDetails.css'
 
 export default function EventDetails() {
@@ -17,9 +18,7 @@ export default function EventDetails() {
   const event = details?.event
   const venue = event?._embedded?.venues?.[0]
   const image = event?.images?.find((item) => item.ratio === '16_9') || event?.images?.[0]
-  const start = event?.dates?.start
-  const date = start?.dateTBA || start?.dateTBD ? 'To be announced' : start?.localDate
-  const time = start?.timeTBA || start?.noSpecificTime ? null : start?.localTime
+  const schedule = getEventScheduleLabels(event || {})
   const classification = event?.classifications?.[0]
   const category = [...new Set([
     classification?.segment?.name, classification?.genre?.name, classification?.subGenre?.name,
@@ -42,8 +41,8 @@ export default function EventDetails() {
         <>
           {image?.url && <img className="event-details-image" src={image.url} alt={event.name} />}
           <dl className="event-facts">
-            <div><dt>Date</dt><dd>{date || 'To be announced'}</dd></div>
-            <div><dt>Time</dt><dd>{time ? `${time.slice(0, 5)} (venue local time)` : 'To be announced'}{event.dates?.timezone && ` - ${event.dates.timezone}`}</dd></div>
+            <div><dt>Date</dt><dd>{schedule.date}</dd></div>
+            <div><dt>Time</dt><dd>{schedule.time}{event.dates?.timezone && ` - ${event.dates.timezone}`}</dd></div>
             <div><dt>Venue</dt><dd>{venue?.name || 'To be announced'}</dd></div>
             <div><dt>Location</dt><dd>{location || 'To be announced'}</dd></div>
             <div><dt>Category</dt><dd>{category || 'Not specified'}</dd></div>

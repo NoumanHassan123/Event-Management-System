@@ -30,7 +30,7 @@ export default function MyEvents() {
   return (
     <section className="events-page" aria-labelledby="my-events-heading">
       <h1 id="my-events-heading">My Registrations</h1>
-      <p role="status">{notice?.userId === user?.id ? notice.message : ''}</p>
+      <p role="status">{notice?.userId === user?.id ? notice?.message : ''}</p>
       {(!registrations || registrations.status === 'loading') && <p role="status">Loading your registrations...</p>}
       {registrations?.status === 'failed' && (
         <div className="events-feedback">
