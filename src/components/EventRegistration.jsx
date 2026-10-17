@@ -11,6 +11,12 @@ export default function EventRegistration({ event }) {
   const location = useLocation()
   const [error, setError] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [now, setNow] = useState(Date.now)
+
+  useEffect(() => {
+    const timer = setInterval(() => setNow(Date.now()), 30000)
+    return () => clearInterval(timer)
+  }, [])
 
   useEffect(() => {
     if (user && !registrations) dispatch(loadRegistrations(user.id))
@@ -37,8 +43,9 @@ export default function EventRegistration({ event }) {
   if (isRegistered) {
     return <p role="status">You are registered for this event. <Link to="/my-events">View my registrations</Link></p>
   }
-  if (getEventGroup(event) === 'completed') {
-    return <p>Registration is closed for this past event.</p>
+  const group = getEventGroup(event, now)
+  if (group === 'completed' || group === 'ongoing') {
+    return <p>Registration is closed because this event has already started.</p>
   }
   if (registrations?.status === 'failed') {
     return (

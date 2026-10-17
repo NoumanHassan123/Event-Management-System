@@ -114,6 +114,15 @@ test('completed events cannot be registered or cancelled', () => {
   assert.equal(readRegistrations('user-a').length, 1)
 })
 
+test('ongoing events retain their registration but cannot accept new registration or cancellation', () => {
+  const ongoing = { ...event, dates: { start: { dateTime: new Date(Date.now() - 1800000).toISOString() }, end: { dateTime: new Date(Date.now() + 1800000).toISOString() } } }
+  assert.throws(() => saveRegistration('user-a', ongoing), /already started/)
+  storage.set('ems.registrations.user-a', JSON.stringify([{ event: ongoing }]))
+  const saved = storage.get('ems.registrations.user-a')
+  assert.throws(() => removeRegistration('user-a', ongoing.id), /ongoing or completed/)
+  assert.equal(storage.get('ems.registrations.user-a'), saved)
+})
+
 test('failed cancellation leaves persisted registrations unchanged', () => {
   const items = saveRegistration('user-a', event)
   localStorage.setItem = () => { throw new Error('Storage blocked') }

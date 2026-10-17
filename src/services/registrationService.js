@@ -33,7 +33,8 @@ export function saveRegistration(userId, event) {
     throw new Error('You are already registered for this event.')
   }
   if (event.dates?.status?.code === 'cancelled') throw new Error('This event has been cancelled.')
-  if (getEventGroup(event) === 'completed') throw new Error('Registration is closed for this past event.')
+  const group = getEventGroup(event)
+  if (group === 'completed' || group === 'ongoing') throw new Error('Registration is closed for events that have already started.')
   const image = event.images?.find((item) => item.ratio === '16_9') || event.images?.[0]
   const snapshot = {
     id: event.id, name: event.name, dates: event.dates || {},
@@ -52,8 +53,9 @@ export function removeRegistration(userId, eventId) {
   const items = readRegistrations(userId)
   const registration = items.find((item) => item.event.id === eventId)
   if (!registration) throw new Error('This registration could not be found. Please reload your registrations.')
-  if (getEventGroup(registration.event) === 'completed') {
-    throw new Error('Registrations for completed events cannot be cancelled.')
+  const group = getEventGroup(registration.event)
+  if (group === 'completed' || group === 'ongoing') {
+    throw new Error('Registrations for ongoing or completed events cannot be cancelled.')
   }
   const updated = items.filter((item) => item.event.id !== eventId)
   try {

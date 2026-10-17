@@ -14,6 +14,7 @@ Manual browser interactions and mobile visual verification are pending. The chec
 - Register for the event, open My Registrations, and refresh. Confirm the event remains and duplicate registration is blocked.
 - Log out, create a different demo account, and confirm its registrations are empty.
 - Log back in to the first account and cancel the registration. Refresh and confirm removal; register again to confirm this is allowed.
+- Check Upcoming, Ongoing, Completed, and Date To Be Announced groups. A started event without an end time should stay ongoing through its final scheduled venue-local day; new registration and cancellation should be unavailable once it starts.
 - Search by keyword, category, city, and country. Test no results and Clear filters.
 - Use Next and Previous, visit details and return, and confirm filters and page remain selected.
 - Check an unknown event URL and retry feedback. Test Offline mode in browser developer tools, then reconnect and retry.

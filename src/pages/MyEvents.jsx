@@ -24,9 +24,9 @@ export default function MyEvents() {
     if (user && !registrations) dispatch(loadRegistrations(user.id))
   }, [dispatch, user, registrations])
 
-  const groups = { upcoming: [], completed: [], undated: [] }
+  const groups = { upcoming: [], ongoing: [], completed: [], undated: [] }
   for (const item of registrations?.items || []) groups[getEventGroup(item.event, now)].push(item)
-  const titles = { upcoming: 'Upcoming Events', completed: 'Completed Events', undated: 'Date To Be Announced' }
+  const titles = { upcoming: 'Upcoming Events', ongoing: 'Ongoing Events', completed: 'Completed Events', undated: 'Date To Be Announced' }
 
   return (
     <section className="events-page my-events-page" aria-labelledby="my-events-heading">
@@ -50,12 +50,15 @@ export default function MyEvents() {
         Object.entries(groups).map(([group, items]) => (
           <section className="registration-group" key={group} aria-labelledby={`group-${group}`}>
             <h2 id={`group-${group}`}>{titles[group]} ({items.length})</h2>
+            {group === 'ongoing' && items.length > 0 && (
+              <p className="registration-group-note">These events have started. If an end time is unavailable, completion is estimated after the final scheduled day in the venue's time zone.</p>
+            )}
             {items.length ? (
               <div className="events-grid">
                 {items.map((item) => (
                   <div className="registered-event" key={item.event.id}>
                     <EventCard event={item.event} />
-                    {group !== 'completed' && (
+                    {(group === 'upcoming' || group === 'undated') && (
                       <CancelRegistration event={item.event} onCancelled={(name) => {
                         setNotice({ userId: user.id, message: `Registration for ${name} cancelled.` })
                       }} />

@@ -27,7 +27,7 @@ The interface pairs warm ivory backgrounds with navy and coral accents, ticket-i
 | **Browse more** | Move through 20 results per page with Previous/Next controls while keeping your filters. |
 | **Manage accounts** | Create an account, log in, log out, and restore your session after refreshing. |
 | **Build your lineup** | Register for events, prevent duplicate registrations, and cancel eligible registrations. |
-| **Stay organized** | View your own upcoming, completed, and date-to-be-announced events in My Registrations. |
+| **Stay organized** | View your own upcoming, ongoing, completed, and date-to-be-announced events in My Registrations. |
 | **Enjoy the details** | Reveal/hide passwords, use keyboard navigation, and pause decorative hero animations. Reduced-motion preferences are respected. |
 
 Gather includes loading, empty, retry, missing-event, and validation states. New search results take precedence over older responses, and retries retain the selected filters and page.
@@ -153,8 +153,8 @@ For a feature-to-source map, see [Implementation reference](REQUIREMENTS.md).
 - **Passwords:** 8-128 characters, at least one letter or number, and at least one special character. Leading/trailing whitespace, hidden/control characters, and all-symbol passwords are rejected. Confirmation must match.
 - **Existing accounts:** previously created non-Gmail accounts remain accessible; new signup strength rules are not reapplied to existing login passwords.
 - **Sessions and registrations:** saved in this browser, with separate event registrations for each user. Clearing site storage removes this local data. Data does not synchronize across devices or browser profiles.
-- **Cancellation:** upcoming and undated registrations can be cancelled and registered again. Completed events remain in history.
-- **Schedule groups:** based on saved event dates. Known end timestamps take precedence over start timestamps; date-only events stay upcoming through the venue's local calendar day. Later provider schedule changes are not automatically synchronized into saved registrations.
+- **Cancellation:** upcoming and undated registrations can be cancelled and registered again. Ongoing and completed registrations cannot be cancelled, and new registration closes once an event has started.
+- **Schedule groups:** based on saved event dates. A confirmed start moves an event into Ongoing; an exact end timestamp marks it Completed. If an end timestamp is missing, completion is estimated after the final scheduled venue-local calendar day (the start day when no end date is supplied). UTC is used when no venue timezone is available. Date-only events remain upcoming on their start day; multi-day events become ongoing on subsequent scheduled days. Later provider schedule changes are not automatically synchronized into saved registrations.
 
 ## Scope and deployment notes
 
@@ -176,7 +176,7 @@ npm run lint
 npm run build
 ```
 
-The current suite contains **55 automated tests**, covering validation, session restoration, Gmail aliases, duplicate signup, user isolation, registration/cancellation persistence, schedule boundaries, malformed storage, API errors, filters, pagination, and stale responses.
+The current suite contains **63 automated tests**, covering validation, session restoration, Gmail aliases, duplicate signup, user isolation, registration/cancellation persistence, ongoing events, timezone and multi-day schedule boundaries, malformed storage, API errors, filters, pagination, and stale responses.
 
 Tests use isolated storage and mocked API responses; they do not require your API key or modify your browser's real accounts. Live Ticketmaster requests have also been checked separately. Component render checks have covered the primary pages.
 
